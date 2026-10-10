@@ -14,7 +14,7 @@ Read this first. It is the source of truth for decisions already made.
 | CRM, quotes/contracts, schedule, timesheets, invoices, payments | Jobber | Single source of truth. "If it is not in Jobber, it did not happen." |
 | Internal team communication | Slack | One workspace, 8 fixed channels (see `slack/channels.json`). Client conversations stay in Jobber. |
 | Glue between apps | Zapier | Facebook Lead Ads -> Jobber request -> Slack #leads; quote approved -> #wins-and-issues. Specs in `zapier/zaps.md`. |
-| Hours and monthly payroll | **CleanScene Hours** app: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Source `hours-app/index.html`. Private db (rules: read/write admin only). Collections `crew` (name, role, rate, emails, active), `sites` (name, type, keywords, active), `shifts` (date, crew, site, start, end, breakMin, status scheduled/confirmed/cancelled, source calendar/manual). Pulls Google Calendar `list_events` as the viewer. `hours-tracker/` is the spreadsheet backup. |
+| Hours and monthly payroll | **CleanScene Hours** app: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Source `hours-app/index.html`. Private db. Rules: root read/write `interact` (Ali is shared as Contributor), `rates` read/write `owner` only (Adam). Ali never sees rates or pay; the Pay tab is owner-only. Collections `crew` (name, role, emails, active), `rates/{crewId}` (rate), `sites` (name, address, type, keywords, active), `shifts` (date, crew, site, start, end, breakMin, status scheduled/confirmed/cancelled, source calendar/manual). Pulls Google Calendar `list_events` as the viewer. `hours-tracker/` is the spreadsheet backup. |
 | Documents | Google Drive | Signed master agreements, HSE/site documents. |
 
 Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), job posts in Google Calendar, checking Gmail to see who paid.
@@ -43,14 +43,14 @@ Status (2026-10-10):
 - Floater names in the tracker are placeholders (rates are real: Ali $28, floaters $25).
 - Whether BC work is running outside Jobber or paused (asked 2026-10-10, not yet answered).
 - Confirm the Jobber plan includes time tracking and Zapier access.
-- The original hours file (an .xlsx in Drive) has not been reviewed yet; existing records still need migrating into `Hours Log`.
+- Ali's original hours file (https://docs.google.com/spreadsheets/d/1RHJDQmZ-lgQHSmDtP17byzyqdEvfTApX) is an .xlsx; the Sheets connector cannot read it until it is saved as a Google Sheet. Not reviewed yet.
 
 ## Jobber findings (pulled 2026-10-10)
 - 183 invoices issued since 2026-07-01; every recent client is in Yellowknife. BC has only a few 2024 client records, so BC work is either not in Jobber or not active. Ask Adam.
 - `hours-tracker/sites.json` holds the 79 clients invoiced 2026-08-12 to 2026-10-09 plus NACC; the tracker's Sites tab is built from it.
 - Jobber's 40 "active" recurring jobs are 20 jobs entered twice (all created 2025-07-23, most marked late, $0 totals). Several of those clients have no invoice since mid-August. The Jobber schedule is not yet the real schedule: clean up duplicates and stale jobs before Week 4 of the rollout.
 - NACC = Northern Arts and Cultural Centre. Work continues (calendar: Sep 16 deep clean, Oct 16/17/23/24 cleans) but the last invoice is #1487 (2026-07-24, $945, unpaid). Aug/Sep work looks uninvoiced.
-- Uninvoiced calendar work also at Stanton Territorial Hospital (no Jobber invoice ever) and a Day care at 5102 53 St (not in Jobber; contact Elsa Nanji).
+- Uninvoiced calendar work also at Stanton Territorial Hospital (no Jobber invoice ever). The calendar's "Day care" at 5102 53 St is La Taniere, CSFTNO (invoiced monthly), not missing work.
 - Saved services exist for most work (house, deep, move-in/out, office, floors, carpets, mats, commercial kitchen, school, remote camp), but House Clean, Move Out Clean and Deep Clean have $0 default prices.
 
 ## What is not code

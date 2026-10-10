@@ -9,7 +9,7 @@ Version 2026-10-10. One section per part of the business. **If it is not in Jobb
 | Clients, requests, quotes, signed contracts, invoices, payments | **Jobber** | Adam | Live |
 | The schedule (who works where, when) | **Google Calendar invites today -> Jobber visits** | Ali | Moving: clients tagged `Move-to-Jobber-schedule` |
 | Team chat, schedule changes, open shifts, issues | **Slack** (8 channels, Open Shifts list, Team Playbook) | Ali | Live |
-| Crew hours and monthly pay | **CleanScene Hours** app (private: Adam + Ali) https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Ali checks, Adam pays | Live |
+| Crew hours and monthly pay | **CleanScene Hours** app (Ali logs hours; pay visible to Adam only) https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Ali checks, Adam pays | Live |
 | Facebook leads -> Jobber -> #leads; quote won -> #wins-and-issues | **Zapier** | Adam | Specs ready (`zapier/zaps.md`) |
 | Weekly review, monthly payroll, billing checks | **Google Calendar** reminders on Adam's calendar | Adam | Live |
 | Signed agreements, HSE/site documents | **Google Drive** > CleanScene | Adam | |
@@ -56,7 +56,7 @@ By **6 pm** Ali confirms tomorrow's work and posts changes in **#schedule**.
 4. Once a client is in Jobber scheduling: clock in/out on the visit in the Jobber app.
 
 ## 6. Hours (Ali: 2 minutes a day)
-Private. Only Adam and Ali (shared as Editor) can open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
+Ali is shared as a **Contributor**: he sees clients (name and address), who worked, and hours. He never sees pay rates or the Pay tab; those are Adam's only. Open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
 1. **Log tab > Pull shifts from Google Calendar** (yesterday is pre-selected). Every job with crew invited becomes one shift per person at the scheduled times. Already-logged shifts are skipped, so pulling twice is safe.
 2. Work not on the calendar: **Log a shift** (tap everyone on the crew, one save).
 3. **Needs a look** lists only problems. Tap a shift to fix it:
@@ -94,7 +94,7 @@ Private. Only Adam and Ali (shared as Editor) can open **CleanScene Hours**: htt
 | 1st of month 9:00 | Adam | Payroll; commercial invoices |
 
 ## 11. Access and privacy
-- Hours, rates, pay: CleanScene Hours only (Adam + Ali). Never in Slack public channels, email, or Jobber notes.
+- Hours: CleanScene Hours (Adam + Ali). Pay rates and gross pay: Adam only (the app hides them from Ali). Never in Slack public channels, email, or Jobber notes.
 - Client payment details: Jobber only.
 - Slack #leads and #management: Adam + Ali only.
 - Door codes and alarm codes: in the job's calendar event / Jobber property notes only. Never in Slack.

@@ -32,7 +32,7 @@ CREW = {
 # First matching keyword (in event title or location, case-insensitive) -> Sites tab name.
 SITE_KEYWORDS = [
     ("allain", "École Allain St-Cyr, CSFTNO"),
-    ("day care", "Day care - 5102 53 St"),
+    ("day care", "La Taniere, CSFTNO"),  # the daycare at 5102 53 St is La Taniere
     ("melissa", "Melissa Kruger"),
     ("athena", "Athena Wells"),
     ("co operators", "The Co-operators c/o Nathalie Gauthier Dore"),

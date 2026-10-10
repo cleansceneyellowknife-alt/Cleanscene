@@ -125,7 +125,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
     <nav class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-log" aria-selected="true" data-view="log">Log</button>
       <button class="tab" role="tab" id="tab-shifts" aria-selected="false" data-view="shifts">Shifts<span class="count" id="flagCount" hidden>0</span></button>
-      <button class="tab" role="tab" id="tab-pay" aria-selected="false" data-view="pay">Pay</button>
+      <button class="tab" role="tab" id="tab-pay" aria-selected="false" data-view="pay" hidden>Pay</button>
       <button class="tab" role="tab" id="tab-setup" aria-selected="false" data-view="setup">Crew &amp; clients</button>
     </nav>
   </div>
@@ -148,6 +148,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
       </div>
       <label>Client / site<input id="fSite" list="siteList" required placeholder="Start typing a client"></label>
       <datalist id="siteList"></datalist>
+      <div id="fAddr" class="small muted" aria-live="polite"></div>
       <div style="display:grid;gap:6px">
         <span class="small muted" style="font-weight:600">Who worked (tap everyone on the crew)</span>
         <div class="chips" id="fCrew"></div>
@@ -216,14 +217,14 @@ tfoot td { font-weight: 600; border-bottom: 0 }
   <section id="view-setup" hidden>
     <div class="panel">
       <h2>Crew</h2>
-      <p class="small muted" style="margin:0">Calendar emails link calendar invites to the right person. Rates are visible only to Adam and Ali.</p>
+      <p class="small muted" style="margin:0">Calendar emails link calendar invites to the right person.</p>
       <div class="tbl"><table>
-        <thead><tr><th>Name</th><th>Role</th><th class="n">Rate $/h</th><th>Calendar emails</th><th>Active</th><th></th></tr></thead>
+        <thead><tr><th>Name</th><th>Role</th><th class="n owner-only" hidden>Rate $/h</th><th>Calendar emails</th><th>Active</th><th></th></tr></thead>
         <tbody id="crewBody"></tbody>
       </table></div>
       <form class="row-actions" id="crewAdd">
         <input id="caName" placeholder="New crew member name" style="flex:1 1 180px" required>
-        <input id="caRate" type="number" step="0.25" min="0" placeholder="Rate" style="flex:0 1 110px" required>
+        <input id="caRate" class="owner-only" hidden type="number" step="0.25" min="0" placeholder="Rate $/h" style="flex:0 1 110px">
         <button type="submit">Add crew</button>
       </form>
     </div>
@@ -232,12 +233,13 @@ tfoot td { font-weight: 600; border-bottom: 0 }
       <p class="small muted" style="margin:0">Use the client's name exactly as in Jobber. Calendar words: words in a calendar event that mean this client (for example "day care" or "hospital").</p>
       <input id="siteSearch" placeholder="Search clients" aria-label="Search clients">
       <div class="tbl"><table>
-        <thead><tr><th>Client / site</th><th>Type</th><th>Calendar words</th><th>Active</th></tr></thead>
+        <thead><tr><th>Client / site</th><th>Address</th><th>Type</th><th>Calendar words</th><th>Active</th></tr></thead>
         <tbody id="sitesBody"></tbody>
       </table></div>
       <form class="row-actions" id="siteAdd">
         <input id="saName" placeholder="New client name (as in Jobber)" style="flex:1 1 220px" required>
         <select id="saType" style="flex:0 1 150px"><option>Residential</option><option>Commercial</option></select>
+        <input id="saAddr" placeholder="Address" style="flex:1 1 200px">
         <input id="saWords" placeholder="Calendar words, comma separated" style="flex:1 1 200px">
         <button type="submit">Add client</button>
       </form>
@@ -282,7 +284,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
 
   // ---------- state ----------
   const S = { db: null, crew: [], sites: [], shifts: [], month: null, view: safeStore.get("csh.view") || "log",
-              filter: "all", crewFilter: "", editing: null, delArm: false, unsubShifts: null, canWrite: true };
+              filter: "all", crewFilter: "", editing: null, isOwner: false, rates: {}, delArm: false, unsubShifts: null, canWrite: true };
   const now = new Date();
   S.month = { y: now.getFullYear(), m: now.getMonth() };
   const monthRange = () => {
@@ -290,6 +292,8 @@ tfoot td { font-weight: 600; border-bottom: 0 }
     const last = new Date(y, m + 1, 0).getDate();
     return [`${y}-${pad(m + 1)}-01`, `${y}-${pad(m + 1)}-${pad(last)}`];
   };
+  const addrOf = (name) => (S.sites.find((x) => x.name === name) || {}).address || "";
+  const rateOf = (id) => Number(S.rates[id]) || 0;
   const crewById = () => Object.fromEntries(S.crew.map((c) => [c.id, c]));
   const siteNames = () => new Set(S.sites.map((s) => s.name));
 
@@ -317,7 +321,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
   function setView(v) {
     S.view = v; safeStore.set("csh.view", v);
     for (const t of document.querySelectorAll(".tab")) t.setAttribute("aria-selected", String(t.dataset.view === v));
-    for (const id of ["log", "shifts", "pay", "setup"]) $("view-" + id).hidden = id !== v || !S.db;
+    for (const id of ["log", "shifts", "pay", "setup"]) $("view-" + id).hidden = id !== v || !S.db || (id === "pay" && !S.isOwner);
   }
 
   function render() {
@@ -348,7 +352,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
       h("button", { type: "button", class: "chip", "data-id": c.id, "aria-pressed": String(sel.has(c.id)),
         onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
     if (!S.crew.length) $("fCrew").append(h("span", { class: "small muted", text: "Add crew on the Crew & clients tab first." }));
-    $("siteList").replaceChildren(...S.sites.filter((s) => s.active !== false).map((s) => h("option", { value: s.name })));
+    $("siteList").replaceChildren(...S.sites.filter((s) => s.active !== false).map((s) => h("option", { value: s.name, label: s.address || "" })));
     const crew = crewById();
     const needs = S.shifts.filter((s) => flags.get(s.id)).sort((a, b) => a.date.localeCompare(b.date));
     $("needsList").replaceChildren(...(needs.length ? needs.map((s) => shiftRow(s, flags.get(s.id), crew, true))
@@ -364,7 +368,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
         onclick: () => { S.editing = s.id; S.delArm = false; setView("shifts"); render(); $("editor").scrollIntoView({ block: "start" }); } },
       h("div", { class: "who" }, (crew[s.crew]?.name || "Unknown crew") + (withDate ? ` · ${prettyDate(s.date)}` : "")),
       h("div", { class: "hrs" }, hh == null ? "--" : `${hrs(hh)} h`),
-      h("div", { class: "where" }, `${s.site || "No client"} · ${prettyTime(s.start)}–${prettyTime(s.end)}${Number(s.breakMin) ? ` · ${s.breakMin} min break` : ""}${s.note ? ` · ${s.note}` : ""}`),
+      h("div", { class: "where" }, `${s.site || "No client"}${addrOf(s.site) ? ` (${addrOf(s.site)})` : ""} · ${prettyTime(s.start)}–${prettyTime(s.end)}${Number(s.breakMin) ? ` · ${s.breakMin} min break` : ""}${s.note ? ` · ${s.note}` : ""}`),
       h("div", { class: "meta" }, flag ? h("span", { class: "pill bad", text: flag }) : null, status));
   }
 
@@ -430,13 +434,13 @@ tfoot td { font-weight: 600; border-bottom: 0 }
       const mine = S.shifts.filter((s) => s.crew === c.id && s.status !== "cancelled");
       const hh = mine.reduce((a, s) => a + (shiftHours(s) || 0), 0);
       const fl = S.shifts.filter((s) => s.crew === c.id && flags.get(s.id)).length;
-      return { c, n: mine.length, hh, gross: hh * (Number(c.rate) || 0), fl };
+      return { c, n: mine.length, hh, gross: hh * rateOf(c.id), fl };
     }).filter((r) => r.n || r.c.active !== false);
     const T = rows.reduce((a, r) => ({ n: a.n + r.n, hh: a.hh + r.hh, gross: a.gross + r.gross, fl: a.fl + r.fl }), { n: 0, hh: 0, gross: 0, fl: 0 });
     strip($("payStrip"), [[hrs(T.hh), "Crew hours"], [money(T.gross), "Gross pay"], [String(T.fl), "Need a look"]]);
     $("payBody").replaceChildren(...(rows.length ? rows.map((r) => h("tr", {},
       h("td", { text: r.c.name }), h("td", { class: "n", text: r.n }), h("td", { class: "n", text: hrs(r.hh) }),
-      h("td", { class: "n", text: money(Number(r.c.rate) || 0) }), h("td", { class: "n", text: money(r.gross) }),
+      h("td", { class: "n", text: money(rateOf(r.c.id)) }), h("td", { class: "n", text: money(r.gross) }),
       h("td", { class: "n" }, r.fl ? h("span", { class: "pill bad", text: r.fl }) : h("span", { class: "pill ok", text: "0" }))))
       : [h("tr", {}, h("td", { colspan: 6, class: "empty", text: "No crew yet." }))]));
     $("payFoot").replaceChildren(h("tr", {}, h("td", { text: "Total" }), h("td", { class: "n", text: T.n }), h("td", { class: "n", text: hrs(T.hh) }),
@@ -458,30 +462,34 @@ tfoot td { font-weight: 600; border-bottom: 0 }
     if (typing) return; // don't wipe a row someone is editing
     $("crewBody").replaceChildren(...(S.crew.length ? S.crew.map((c) => {
       const r = { name: h("input", { value: c.name, "aria-label": "Name" }), role: h("input", { value: c.role || "", "aria-label": "Role" }),
-        rate: h("input", { type: "number", step: "0.25", min: "0", value: c.rate ?? "", "aria-label": "Rate", style: "max-width:100px" }),
+        rate: h("input", { type: "number", step: "0.25", min: "0", value: S.rates[c.id] ?? "", "aria-label": "Rate", style: "max-width:100px" }),
         emails: h("input", { value: (c.emails || []).join(", "), "aria-label": "Calendar emails" }),
         active: h("input", { type: "checkbox", checked: c.active !== false, "aria-label": "Active" }) };
       const msg = h("span", { class: "small", role: "status" });
-      return h("tr", {}, h("td", {}, r.name), h("td", {}, r.role), h("td", { class: "n" }, r.rate), h("td", {}, r.emails), h("td", {}, r.active),
+      return h("tr", {}, h("td", {}, r.name), h("td", {}, r.role), S.isOwner ? h("td", { class: "n" }, r.rate) : null, h("td", {}, r.emails), h("td", {}, r.active),
         h("td", {}, h("button", { type: "button", onclick: async () => {
-          try { await S.db.doc("crew/" + c.id).update({ name: r.name.value.trim(), role: r.role.value.trim(), rate: Number(r.rate.value) || 0,
-            emails: words(r.emails.value), active: r.active.checked }); msg.textContent = "Saved"; }
+          try { await S.db.doc("crew/" + c.id).update({ name: r.name.value.trim(), role: r.role.value.trim(),
+            emails: words(r.emails.value), active: r.active.checked });
+            if (S.isOwner && String(S.rates[c.id] ?? "") !== r.rate.value) await S.db.doc("rates/" + c.id).set({ rate: Number(r.rate.value) || 0 });
+            msg.textContent = "Saved"; }
           catch (e) { msg.textContent = writeError(e); } } }, "Save"), msg));
     }) : [h("tr", {}, h("td", { colspan: 6, class: "empty", text: "No crew yet. Add the first person below." }))]));
     const q = ($("siteSearch").value || "").toLowerCase();
-    const list = S.sites.filter((s) => !q || s.name.toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
+    const list = S.sites.filter((s) => !q || s.name.toLowerCase().includes(q) || (s.address || "").toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
     $("sitesBody").replaceChildren(...(list.length ? list.map((s) => {
       const kw = h("input", { value: (s.keywords || []).join(", "), "aria-label": "Calendar words" });
       kw.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ keywords: words(kw.value) }).catch(() => {}));
       const act = h("input", { type: "checkbox", checked: s.active !== false, "aria-label": "Active" });
       act.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ active: act.checked }).catch(() => {}));
-      return h("tr", {}, h("td", { text: s.name }), h("td", { class: "small", text: s.type || "" }), h("td", {}, kw), h("td", {}, act));
-    }) : [h("tr", {}, h("td", { colspan: 4, class: "empty", text: q ? "No client matches that search." : "No clients yet." }))]));
+      const ad = h("input", { value: s.address || "", "aria-label": "Address" });
+      ad.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ address: ad.value.trim() }).catch(() => {}));
+      return h("tr", {}, h("td", { text: s.name }), h("td", {}, ad), h("td", { class: "small", text: s.type || "" }), h("td", {}, kw), h("td", {}, act));
+    }) : [h("tr", {}, h("td", { colspan: 5, class: "empty", text: q ? "No client matches that search." : "No clients yet." }))]));
   }
 
   // ---------- writes ----------
   const writeError = (e) => e && e.code === "quota_exceeded" ? "Storage is full. Delete old shifts, then try again."
-    : e && e.code === "invalid_argument" ? "You don't have permission to change this. Ask Adam for Editor access." : "Couldn't save. Check your connection and try again.";
+    : e && e.code === "invalid_argument" ? "You don't have permission to change this. Ask Adam to share CleanScene Hours with you as a Contributor." : "Couldn't save. Check your connection and try again.";
 
   async function patch(id, data, ok) {
     const m = $("eMsg");
@@ -513,15 +521,16 @@ tfoot td { font-weight: 600; border-bottom: 0 }
 
   $("crewAdd").addEventListener("submit", async (e) => {
     e.preventDefault();
-    try { await S.db.collection("crew").add({ name: $("caName").value.trim(), rate: Number($("caRate").value) || 0, role: "Floater", emails: [], active: true });
+    try { const ref = await S.db.collection("crew").add({ name: $("caName").value.trim(), role: "Floater", emails: [], active: true });
+      if (S.isOwner && $("caRate").value) await S.db.doc("rates/" + ref.id).set({ rate: Number($("caRate").value) || 0 });
       $("caName").value = ""; $("caRate").value = ""; } catch (err) { $("caName").setCustomValidity(writeError(err)); $("caName").reportValidity(); $("caName").setCustomValidity(""); }
   });
   $("siteAdd").addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = $("saName").value.trim();
     if (S.sites.some((s) => s.name.toLowerCase() === name.toLowerCase())) { $("saName").setCustomValidity("That client is already on the list."); $("saName").reportValidity(); $("saName").setCustomValidity(""); return; }
-    try { await S.db.collection("sites").add({ name, type: $("saType").value, keywords: words($("saWords").value), active: true });
-      $("saName").value = ""; $("saWords").value = ""; } catch (err) { $("saName").setCustomValidity(writeError(err)); $("saName").reportValidity(); $("saName").setCustomValidity(""); }
+    try { await S.db.collection("sites").add({ name, address: $("saAddr").value.trim(), type: $("saType").value, keywords: words($("saWords").value), active: true });
+      $("saName").value = ""; $("saWords").value = ""; $("saAddr").value = ""; } catch (err) { $("saName").setCustomValidity(writeError(err)); $("saName").reportValidity(); $("saName").setCustomValidity(""); }
   });
 
   // ---------- Google Calendar import ----------
@@ -578,6 +587,7 @@ tfoot td { font-weight: 600; border-bottom: 0 }
   $("shiftFilters").addEventListener("click", (e) => { const f = e.target.closest("[data-f]"); if (f) { S.filter = f.dataset.f; render(); } });
   $("crewFilter").addEventListener("change", (e) => { S.crewFilter = e.target.value; render(); });
   $("siteSearch").addEventListener("input", () => renderSetup());
+  $("fSite").addEventListener("input", () => { const m = S.sites.find((x) => x.name === $("fSite").value.trim()); $("fAddr").textContent = m && m.address ? m.address : ""; });
   $("fDate").value = today();
   const yest = new Date(); yest.setDate(yest.getDate() - 1);
   $("cFrom").value = ymd(yest); $("cTo").value = ymd(yest);
@@ -598,14 +608,16 @@ tfoot td { font-weight: 600; border-bottom: 0 }
     const db = claude ? await claude.use("db") : null;
     const user = claude ? await claude.use("user") : null;
     if (!db) { $("gate").textContent = "Open CleanScene Hours from claude.ai while signed in. It is private to Adam and Ali."; return; }
-    const canEdit = user ? await user.canEdit() : null;
-    if (canEdit === false) { $("gate").textContent = "CleanScene Hours is private to Adam and Ali. Ask Adam to share it with you as an Editor."; return; }
+    S.isOwner = user ? await user.isOwner() : false;
+    if (user && (await user.can("data.write")) === false) { $("gate").textContent = "CleanScene Hours is private to Adam and Ali. Ask Adam to share it with you as a Contributor."; return; }
     S.db = db;
+    for (const el of document.querySelectorAll(".owner-only, #tab-pay")) el.hidden = !S.isOwner;
+    if (S.isOwner) db.collection("rates").onSnapshot((s) => { S.rates = Object.fromEntries(s.docs.map((d) => [d.id, Number(d.data().rate) || 0])); render(); }, () => {});
     $("gate").hidden = true;
     db.collection("crew").onSnapshot((s) => { S.crew = s.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name)); render(); }, () => {});
     db.collection("sites").limit(1000).onSnapshot((s) => { S.sites = s.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
     subscribeShifts();
-    setView(["log", "shifts", "pay", "setup"].includes(S.view) ? S.view : "log");
+    setView(["log", "shifts", "setup"].concat(S.isOwner ? ["pay"] : []).includes(S.view) ? S.view : "log");
     const mcp = await claude.use("mcp");
     if (mcp) { $("calPanel").hidden = false; $("cPull").addEventListener("click", () => pullCalendar(mcp)); }
   }

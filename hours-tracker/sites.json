@@ -5,373 +5,436 @@
       "site": "507996 N.W.T. Ltd.",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "200-5112 52 Street"
     },
     {
       "site": "5950 N.W.T. LIMITED",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "4007 School Draw Avenue"
     },
     {
       "site": "Aakash Bhandari",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "190 Niven Drive #301"
     },
     {
       "site": "Adriana Ewen",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "22 Bromley Drive"
     },
     {
       "site": "Alex Zimmerman",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "71 Mandeville Drive"
     },
     {
       "site": "Allison Simpson",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "2038 Finlayson Drive"
     },
     {
       "site": "Amber Liang",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5018 49 Street #901"
     },
     {
       "site": "Amy Burt",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "115 Moyle Drive unit 202"
     },
     {
       "site": "Angelique Rossouw",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "3530 Ingraham Drive"
     },
     {
       "site": "Anita Griffore",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "881 Bigelow Crescent"
     },
     {
       "site": "Ann Wind",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5013 57 Street"
     },
     {
       "site": "Arlene Hache",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4907 46th Street"
     },
     {
       "site": "Arlene Yaceyko",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4912 44 Street"
     },
     {
       "site": "Athena Wells",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5611 50A Avenue"
     },
     {
       "site": "Ben Fraser",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "494 Range Lake Road #1"
     },
     {
       "site": "Beverly Speight",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "140 Gwilliam Crescent"
     },
     {
       "site": "Boston Pizza Yellowknife",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "5102 49 Street"
     },
     {
       "site": "Bradley Dusome",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "209 Woolgar Avenue"
     },
     {
       "site": "Brandon Kolb",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "150 Wilkinson Crescent"
     },
     {
       "site": "Callet Jeffrey",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4402 School Draw Avenue #209"
     },
     {
       "site": "Carol Pinto (Jamie Lavers)",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "7 Heal Court"
     },
     {
       "site": "Cathie Harper",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "606 Williams Avenue"
     },
     {
       "site": "Chris Van Drunen",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4015 Finlayson Drive"
     },
     {
       "site": "Chris Van Dyke",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4503 52nd Avenue #1502"
     },
     {
       "site": "CT REIT - Mark's Yellowknife",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "Mark's Yellowknife"
     },
     {
       "site": "Custom Electric Ltd.",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "9 Nahanni Drive"
     },
     {
       "site": "Danielle Desmarais",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "212 Woolgar Avenue"
     },
     {
       "site": "David Jones",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4808 Anderson Thomson Blvd"
     },
     {
       "site": "Day care - 5102 53 St",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "N",
+      "address": "5102 53 Street",
+      "note": "Same as La Taniere, CSFTNO"
     },
     {
       "site": "Dechinta Centre for Research and Learning",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "233 Utsingi Drive"
     },
     {
       "site": "Dennis Althouse",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5109 Forrest Drive"
     },
     {
       "site": "Dexterra Group Inc.",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "5925 Airport Road #suite 1000"
     },
     {
       "site": "Diavik Diamond Mine",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "5201 Franklin Avenue #300"
     },
     {
       "site": "Diocese of The Arctic",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "PO Box 190"
     },
     {
       "site": "Gladys Eggenberger",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "34 Bromley Drive"
     },
     {
       "site": "GreenHaven Guest House",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "5223 54 Street"
     },
     {
       "site": "Housing NWT Shelter / Sobering Centre",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "Day shelter 4807 49th St; Sobering 5111 50th St"
     },
     {
       "site": "Janet Pacey",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "150B Moyle Drive"
     },
     {
       "site": "Janice McKenna",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "111 Moyle Drive #106"
     },
     {
       "site": "Jeff Kincaid",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "1012 Williams Avenue"
     },
     {
       "site": "Kajsa Heyes",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4 Findlay Point"
     },
     {
       "site": "Karen Brown",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "201 Niven Drive"
     },
     {
       "site": "Kat Marlowe",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5218 53 Street"
     },
     {
       "site": "Keith MacNeil",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "51 Calder Crescent"
     },
     {
       "site": "Kelly Irwin",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "107 Loutitt Street"
     },
     {
       "site": "Kevin Paul",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5116 54 Street"
     },
     {
       "site": "La Taniere, CSFTNO",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "5102 53 Street"
     },
     {
       "site": "Loretta Ransom",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5053 Forrest Drive"
     },
     {
       "site": "Lynda Comerford",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "226 Borden Drive"
     },
     {
       "site": "Maneli Alipour",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5300 49 Street"
     },
     {
       "site": "Mary-Lynn Sputek",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5 Coronation Drive"
     },
     {
       "site": "Melissa Kruger",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "6 Burwash Drive"
     },
     {
       "site": "Michael Liddiard",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5009 Forrest Drive"
     },
     {
       "site": "Michael Targett",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "1 Lyons Point"
     },
     {
       "site": "Michel Legault",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "15 Ptarmigan Road #unit 19"
     },
     {
       "site": "Moses Hernandez",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "200 Niven Drive #192"
     },
     {
       "site": "NACC",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "4701 52nd Avenue"
     },
     {
       "site": "Naka Power Utilities (NWT) Ltd.",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "191 Rivett Crescent"
     },
     {
       "site": "Nancy MacNeill",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4503 52nd Avenue #404"
     },
     {
       "site": "Natasha Sanders",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "3502 McDonald Drive #7"
     },
     {
       "site": "Northview Residential (NHF LP)",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "4817 49 Street #102"
     },
     {
       "site": "Orna Phelan",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "2 Wong Court"
     },
     {
       "site": "P and P Integrated",
@@ -383,61 +446,71 @@
       "site": "Sandra Bradbury",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5971 Finlayson Drive"
     },
     {
       "site": "Sandra MacKenzie",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "130 Niven Drive"
     },
     {
       "site": "Shawn McCann",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4303 School Draw Avenue"
     },
     {
       "site": "Shawna Gills",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5009I 44 Street #apartment 201"
     },
     {
       "site": "Simran Gosain",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4503 52nd Avenue #unit 1504"
     },
     {
       "site": "Soham Srimani (Sayani Dirghangi)",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "136B Deweerdt Drive"
     },
     {
       "site": "Sonia D'Angelo-Vibert",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "37 Bromley Drive"
     },
     {
       "site": "Stanley Hotte",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5300 49 Street apt 202"
     },
     {
       "site": "Stanton Territorial Hospital",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "Stanton Territorial Hospital (old and new)"
     },
     {
       "site": "Stefanie Pandke",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5009S 44 Street #302"
     },
     {
       "site": "Steve Swan",
@@ -449,67 +522,78 @@
       "site": "Stuart York",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "4913 Matonabee Street"
     },
     {
       "site": "Susan Eaton",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5009A 44 Street #unit 202"
     },
     {
       "site": "Susanne Matthews",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "46 Rycon Drive"
     },
     {
       "site": "Sutherland's Drugs",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "4910 50th Avenue"
     },
     {
       "site": "Tammy Connors",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "5300 49 Street #203"
     },
     {
       "site": "The Co-operators c/o Nathalie Gauthier Dore",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "321D Old Airport Road"
     },
     {
       "site": "Thea Gillis Campbell",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "151 Kasteel Drive"
     },
     {
       "site": "Triton Enterprises Ltd.",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "341 Old Airport Road"
     },
     {
       "site": "Valerie Fournier",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "223 Niven Drive"
     },
     {
       "site": "Yvonne Pokiak-Asher",
       "region": "Yellowknife",
       "type": "Residential",
-      "active": "Y"
+      "active": "Y",
+      "address": "19 Ellesmere Drive"
     },
     {
       "site": "École Allain St-Cyr, CSFTNO",
       "region": "Yellowknife",
       "type": "Commercial",
-      "active": "Y"
+      "active": "Y",
+      "address": "48 Taylor Road"
     }
   ]
 }
