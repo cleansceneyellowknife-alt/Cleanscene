@@ -44,7 +44,6 @@ PLACEHOLDER_STAFF = [
     # name, region, role, hourly rate, active
     ("Ali", "Yellowknife", "Manager", 28.00, "Y"),
     ("Ermalyn Villanueva", "Yellowknife", "Floater", 25.00, "Y"),
-    ("alijan0987as (confirm name)", "Yellowknife", "Floater", 25.00, "Y"),
 ]
 
 

@@ -28,7 +28,7 @@ Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), j
 
 Status (2026-10-10):
 - Slack workspace built (see `slack/workspace.md`); SOP canvas F0C93DJ7M5W posted in #management.
-- Google Calendar is the real schedule today: Ali creates job events and invites crew (chalijattbabu@gmail.com = Ali, villanuevaermalyn29@gmail.com = Ermalyn Villanueva, alijan0987as@gmail.com = unconfirmed floater). `hours-tracker/import_calendar.py` pre-fills Hours Log from a calendar export; October 1-9 is imported into the shipped .xlsx.
+- Google Calendar is the real schedule today: Ali creates job events and invites crew (chalijattbabu@gmail.com and alijan0987as@gmail.com are both Ali; villanuevaermalyn29@gmail.com = Ermalyn Villanueva). `hours-tracker/import_calendar.py` pre-fills Hours Log from a calendar export; October 1-9 is imported into the shipped .xlsx.
 - Jobber tags added: `Move-to-Jobber-schedule` (18 clients whose recurring work is only in Calendar), `Commercial`/`Residential` on those, `Billing-check` on NACC and Stanton.
 - Adam's calendar: weekly review (Mon 9:00), monthly payroll + commercial invoices (1st, 9:00), billing check (2026-10-13).
 - No connector can create a Google Sheet file; the tracker ships as .xlsx. Slack Lists were refused for employee hours (privacy).

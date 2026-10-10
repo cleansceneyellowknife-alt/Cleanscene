@@ -26,7 +26,7 @@ FIRST, LAST = 2, 2001
 CREW = {
     "chalijattbabu@gmail.com": "Ali",
     "villanuevaermalyn29@gmail.com": "Ermalyn Villanueva",
-    "alijan0987as@gmail.com": "alijan0987as (confirm name)",
+    "alijan0987as@gmail.com": "Ali",  # Ali's second account
 }
 
 # First matching keyword (in event title or location, case-insensitive) -> Sites tab name.

@@ -16,7 +16,7 @@ Version 2026-10-10. One section per part of the business. **If it is not in Jobb
 
 Funnel: **Lead -> Request -> Quote -> Signed -> Job -> Visit -> Hours -> Invoice -> Paid -> Review / Rebook**
 
-Team: **Ali** (manager, schedules and assigns all work, $28/h). **Floaters** (Ermalyn Villanueva, alijan0987as; $25/h).
+Team: **Ali** (manager, schedules and assigns all work, $28/h). **Floaters** (Ermalyn Villanueva; $25/h). Ali uses two calendar emails (chalijattbabu, alijan0987as); both count as Ali.
 
 ---
 
