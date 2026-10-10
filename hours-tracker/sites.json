@@ -1,5 +1,5 @@
 {
-  "_source": "Jobber clients invoiced 2026-08-12 to 2026-10-09, plus NACC. Pulled 2026-10-10. Type is a best guess from the client name; correct it on the Sites tab.",
+  "_source": "Jobber clients invoiced 2026-08-12 to 2026-10-09, plus NACC. Pulled 2026-10-10. Type is a best guess from the client name; correct it on the Sites tab. Added 2026-10-10: recurring calendar clients with no recent Jobber invoice.",
   "sites": [
     {
       "site": "507996 N.W.T. Ltd.",
@@ -44,7 +44,19 @@
       "active": "Y"
     },
     {
+      "site": "Amy Burt",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
       "site": "Angelique Rossouw",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Anita Griffore",
       "region": "Yellowknife",
       "type": "Residential",
       "active": "Y"
@@ -158,6 +170,12 @@
       "active": "Y"
     },
     {
+      "site": "Day care - 5102 53 St",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
       "site": "Dechinta Centre for Research and Learning",
       "region": "Yellowknife",
       "type": "Commercial",
@@ -195,6 +213,12 @@
     },
     {
       "site": "GreenHaven Guest House",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Housing NWT Shelter / Sobering Centre",
       "region": "Yellowknife",
       "type": "Commercial",
       "active": "Y"
@@ -401,6 +425,12 @@
       "site": "Stanley Hotte",
       "region": "Yellowknife",
       "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Stanton Territorial Hospital",
+      "region": "Yellowknife",
+      "type": "Commercial",
       "active": "Y"
     },
     {

@@ -5,7 +5,7 @@ Then:   upload to Google Drive, open with Google Sheets, File > Save as Google S
         and share it with Adam and the manager only.
 
 Formulas are Google Sheets compatible (SUMIFS/COUNTIFS/INDEX/MATCH only).
-Ali (manager, $28/h) is real; floater names are placeholders ($25/h). Sites come from sites.json (pulled from Jobber).
+Staff = crew invited to jobs on the Google Calendar; Ali $28/h, floaters $25/h. Sites come from sites.json (pulled from Jobber).
 """
 import json
 from pathlib import Path
@@ -43,9 +43,8 @@ SITE_REGIONS = f"Sites!$B$2:$B${SITES_LAST}"
 PLACEHOLDER_STAFF = [
     # name, region, role, hourly rate, active
     ("Ali", "Yellowknife", "Manager", 28.00, "Y"),
-    ("Floater 1 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
-    ("Floater 2 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
-    ("Floater 3 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
+    ("Ermalyn Villanueva", "Yellowknife", "Floater", 25.00, "Y"),
+    ("alijan0987as (confirm name)", "Yellowknife", "Floater", 25.00, "Y"),
 ]
 
 

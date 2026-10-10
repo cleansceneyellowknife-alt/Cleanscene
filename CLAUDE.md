@@ -26,7 +26,12 @@ Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), j
 - `zapier/zaps.md` — exact Zap specs (no-code; built in the Zapier UI).
 - `jobber/` — Jobber settings checklist and a draft of standard quote terms.
 
-Status (2026-10-10): all files above exist. Next: migrate the original hours .xlsx into `Hours Log` once it is saved as a Google Sheet.
+Status (2026-10-10):
+- Slack workspace built (see `slack/workspace.md`); SOP canvas F0C93DJ7M5W posted in #management.
+- Google Calendar is the real schedule today: Ali creates job events and invites crew (chalijattbabu@gmail.com = Ali, villanuevaermalyn29@gmail.com = Ermalyn Villanueva, alijan0987as@gmail.com = unconfirmed floater). `hours-tracker/import_calendar.py` pre-fills Hours Log from a calendar export; October 1-9 is imported into the shipped .xlsx.
+- Jobber tags added: `Move-to-Jobber-schedule` (18 clients whose recurring work is only in Calendar), `Commercial`/`Residential` on those, `Billing-check` on NACC and Stanton.
+- Adam's calendar: weekly review (Mon 9:00), monthly payroll + commercial invoices (1st, 9:00), billing check (2026-10-13).
+- No connector can create a Google Sheet file; the tracker ships as .xlsx. Slack Lists were refused for employee hours (privacy).
 
 ## Conventions
 - Hours Tracker tab and column names are fixed: `Hours Log` (A Date, B Employee, C Client / Site, D Start, E End, F Break (min), G Hours, H Region, I Week of (Mon), J Jobber visit # / note, K Check, L hidden visit helper), `Staff`, `Sites`, `Pay Period`, `Weekly`, `Start Here`. Formulas are pre-filled in rows 2–2001 of `Hours Log`; new shifts go in the first row where column A is empty, never appended after row 2001.
@@ -44,7 +49,8 @@ Status (2026-10-10): all files above exist. Next: migrate the original hours .xl
 - 183 invoices issued since 2026-07-01; every recent client is in Yellowknife. BC has only a few 2024 client records, so BC work is either not in Jobber or not active. Ask Adam.
 - `hours-tracker/sites.json` holds the 79 clients invoiced 2026-08-12 to 2026-10-09 plus NACC; the tracker's Sites tab is built from it.
 - Jobber's 40 "active" recurring jobs are 20 jobs entered twice (all created 2025-07-23, most marked late, $0 totals). Several of those clients have no invoice since mid-August. The Jobber schedule is not yet the real schedule: clean up duplicates and stale jobs before Week 4 of the rollout.
-- NACC = Northern Arts and Cultural Centre (4701 52nd Ave, Yellowknife). Billed roughly monthly through July; last invoice #1487 (2026-07-24, $945) is unpaid and past due, and nothing was invoiced for August or September. Adam is checking.
+- NACC = Northern Arts and Cultural Centre. Work continues (calendar: Sep 16 deep clean, Oct 16/17/23/24 cleans) but the last invoice is #1487 (2026-07-24, $945, unpaid). Aug/Sep work looks uninvoiced.
+- Uninvoiced calendar work also at Stanton Territorial Hospital (no Jobber invoice ever) and a Day care at 5102 53 St (not in Jobber; contact Elsa Nanji).
 - Saved services exist for most work (house, deep, move-in/out, office, floors, carpets, mats, commercial kitchen, school, remote camp), but House Clean, Move Out Clean and Deep Clean have $0 default prices.
 
 ## What is not code
