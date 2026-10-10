@@ -5,10 +5,9 @@ Then:   upload to Google Drive, open with Google Sheets, File > Save as Google S
         and share it with Adam and the manager only.
 
 Formulas are Google Sheets compatible (SUMIFS/COUNTIFS/INDEX/MATCH only).
-Staff names and rates are placeholders. Sites come from sites.json (pulled from Jobber).
+Ali (manager, $28/h) is real; floater names are placeholders ($25/h). Sites come from sites.json (pulled from Jobber).
 """
 import json
-from datetime import date
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -22,8 +21,6 @@ OUT = HERE / "CleanScene_Hours_Tracker.xlsx"
 LOG_FIRST, LOG_LAST = 2, 2001
 STAFF_LAST = 101   # Staff!A2:A101 -> 100 people
 SITES_LAST = 501   # Sites!A2:A501 -> 500 sites
-PAY_PERIOD_ANCHOR = date(2026, 9, 28)  # a Monday; first day of a pay period (confirm with Adam)
-PAY_PERIOD_DAYS = 14                   # bi-weekly (assumption)
 
 NAVY = "1F3A5F"
 HEADER_FILL = PatternFill("solid", fgColor=NAVY)
@@ -45,10 +42,10 @@ SITE_REGIONS = f"Sites!$B$2:$B${SITES_LAST}"
 
 PLACEHOLDER_STAFF = [
     # name, region, role, hourly rate, active
-    ("Staff 1 (replace)", "Yellowknife", "Cleaner", 20.00, "Y"),
-    ("Staff 2 (replace)", "Yellowknife", "Cleaner", 20.00, "Y"),
-    ("Staff 3 (replace)", "Yellowknife", "Lead Cleaner", 22.00, "Y"),
-    ("Staff 4 (replace)", "Richmond/Vancouver", "Cleaner", 20.00, "Y"),
+    ("Ali", "Yellowknife", "Manager", 28.00, "Y"),
+    ("Floater 1 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
+    ("Floater 2 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
+    ("Floater 3 (replace name)", "Yellowknife", "Floater", 25.00, "Y"),
 ]
 
 
@@ -83,7 +80,7 @@ def build_start_here(ws):
         ("", None),
         ("ADAM: reviewing", BOLD),
         ("- Pay Period tab: hours, shifts, gross pay and flags per person for the current period. "
-         "Change 'Periods back' to see earlier periods.", None),
+         "Pay is monthly: set 'Months back' to 1 to run last month's payroll.", None),
         ("- Weekly tab: hours per person per day, and the site cross-check against Jobber visits.", None),
         ("- Every Monday: open Weekly, set 'Weeks back' to 1, enter Jobber visits/hours for last week, clear every flag.", None),
         ("", None),
@@ -177,18 +174,12 @@ def build_sites(ws):
 
 def build_pay_period(ws):
     ws["A1"], ws["A1"].font = "Pay Period", TITLE_FONT
-    labels = [
-        ("A2", "First period start (a Monday)", "B2", PAY_PERIOD_ANCHOR),
-        ("A3", "Period length (days): 14 = bi-weekly, 7 = weekly", "B3", PAY_PERIOD_DAYS),
-        ("A4", "Periods back (0 = current)", "B4", 0),
-    ]
-    for la, text, va, val in labels:
-        ws[la] = text
-        ws[va] = val
-        ws[va].fill = INPUT_FILL
-    ws["B2"].number_format = "yyyy-mm-dd"
-    ws["A5"], ws["B5"] = "Period start", "=B2+(INT((TODAY()-B2)/B3)-B4)*B3"
-    ws["A6"], ws["B6"] = "Period end", "=B5+B3-1"
+    # Pay is monthly: the period is a calendar month.
+    ws["A2"], ws["B2"] = "Months back (0 = this month, 1 = last month)", 0
+    ws["B2"].fill = INPUT_FILL
+    ws["A3"] = "Pay is monthly. Run payroll from last month (Months back = 1)."
+    ws["A5"], ws["B5"] = "Period start", "=DATE(YEAR(TODAY()),MONTH(TODAY())-B2,1)"
+    ws["A6"], ws["B6"] = "Period end", "=DATE(YEAR(TODAY()),MONTH(TODAY())-B2+1,0)"
     for c in ("B5", "B6"):
         ws[c].number_format = DATE_FMT
         ws[c].font = BOLD

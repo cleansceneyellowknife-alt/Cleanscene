@@ -18,9 +18,9 @@
     {
       "name": "open-shifts",
       "private": false,
-      "topic": "Extra shifts up for grabs. Reply to claim.",
-      "purpose": "Manager posts uncovered visits. Staff claim them in the thread.",
-      "pinned": "How to claim: reply in the thread with 'I'll take it'. The shift is yours only when the manager reacts with a checkmark and assigns you in Jobber. Format for posts: Region / Date / Time / Site (no full address) / Est. hours / Type of clean."
+      "topic": "Extra shifts that need cover. Reply if you are available; the manager assigns.",
+      "purpose": "Manager posts uncovered visits. Staff say they are available; the manager picks who works it.",
+      "pinned": "Shifts are assigned, not first-come. Reply 'Available' in the thread. The manager picks who works it and assigns them in Jobber; you are on the shift only once it shows in your Jobber app. Post format: Region / Date / Time / Site (no full address) / Est. hours / Type of clean."
     },
     {
       "name": "leads",

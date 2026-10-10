@@ -5,7 +5,8 @@ Read this first. It is the source of truth for decisions already made.
 ## The business
 - CleanScene Inc. — residential and commercial cleaning and facilities services.
 - Two regions: Richmond/Vancouver, BC and Yellowknife, NT. Owner: Adam (operations, quoting, contracts, client service).
-- One manager logs crew hours. Only Adam and the manager may see hours and pay data.
+- Ali is the main manager (also works shifts, $28/h) and logs crew hours. The rest of the crew are mostly floaters ($25/h). Only Adam and Ali may see hours and pay data.
+- Pay is monthly (calendar month). Open shifts are manager-assigned, not first-come-first-served.
 
 ## The target system (decided)
 | Layer | Tool | Notes |
@@ -34,9 +35,8 @@ Status (2026-10-10): all files above exist. Next: migrate the original hours .xl
 - Never store employee pay rates or client payment details anywhere except the Hours Tracker and Jobber.
 
 ## Open items / assumptions to confirm with Adam
-- Pay period assumed bi-weekly (one cell on `Pay Period` to change).
-- Staff names and rates in the tracker are placeholders.
-- Whether open shifts are first-come-first-served or manager-assigned (asked in the SOP doc).
+- Floater names in the tracker are placeholders (rates are real: Ali $28, floaters $25).
+- Whether BC work is running outside Jobber or paused (asked 2026-10-10, not yet answered).
 - Confirm the Jobber plan includes time tracking and Zapier access.
 - The original hours file (an .xlsx in Drive) has not been reviewed yet; existing records still need migrating into `Hours Log`.
 
@@ -44,7 +44,7 @@ Status (2026-10-10): all files above exist. Next: migrate the original hours .xl
 - 183 invoices issued since 2026-07-01; every recent client is in Yellowknife. BC has only a few 2024 client records, so BC work is either not in Jobber or not active. Ask Adam.
 - `hours-tracker/sites.json` holds the 79 clients invoiced 2026-08-12 to 2026-10-09 plus NACC; the tracker's Sites tab is built from it.
 - Jobber's 40 "active" recurring jobs are 20 jobs entered twice (all created 2025-07-23, most marked late, $0 totals). Several of those clients have no invoice since mid-August. The Jobber schedule is not yet the real schedule: clean up duplicates and stale jobs before Week 4 of the rollout.
-- NACC exists in Jobber but had no invoice between 2026-08-12 and 2026-10-09; worth checking for a missed invoice.
+- NACC = Northern Arts and Cultural Centre (4701 52nd Ave, Yellowknife). Billed roughly monthly through July; last invoice #1487 (2026-07-24, $945) is unpaid and past due, and nothing was invoiced for August or September. Adam is checking.
 - Saved services exist for most work (house, deep, move-in/out, office, floors, carpets, mats, commercial kitchen, school, remote camp), but House Clean, Move Out Clean and Deep Clean have $0 default prices.
 
 ## What is not code

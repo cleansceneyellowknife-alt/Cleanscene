@@ -7,9 +7,9 @@ One page per part of the business. If it is not in Jobber, it did not happen.
 | Job to be done | Tool | Owner |
 | --- | --- | --- |
 | Leads, clients, quotes, contracts, schedule, crew clock-in, invoices, payments | **Jobber** | Adam |
-| Team chat, schedule changes, open shifts, issues | **Slack** (8 channels) | Manager |
+| Team chat, schedule changes, open shifts, issues | **Slack** (8 channels) | Ali (manager) |
 | Moving data between apps (Facebook leads, wins) | **Zapier** | Adam |
-| Crew hours and pay review | **Google Sheet "CleanScene Hours Tracker"** (private) | Manager enters, Adam reviews |
+| Crew hours and pay review | **Google Sheet "CleanScene Hours Tracker"** (private) | Ali enters, Adam reviews |
 | Signed agreements, HSE and site documents | **Google Drive** > CleanScene | Adam |
 
 Funnel: **Lead -> Request -> Quote -> Signed (approved) -> Job -> Visit -> Hours -> Invoice -> Paid -> Review / Rebook**
@@ -45,9 +45,9 @@ Target: every lead quoted within 24 hours.
 
 ## 4. Open shifts
 1. Uncovered visit? Manager posts in **#open-shifts**: Region / Date / Time / Site (no full address) / Est. hours / Type of clean.
-2. Staff reply "I'll take it" in the thread.
-3. The shift is confirmed only when the manager reacts with a checkmark **and** assigns the person in Jobber.
-4. Rule: first come, first served unless the manager says the shift needs a specific person. *(Adam to confirm.)*
+2. Staff who can work it reply "Available" in the thread.
+3. **The manager assigns.** Ali picks who works it (skills, region, hours already that month) and assigns them in Jobber.
+4. A shift is confirmed only when it shows in the person's Jobber app. Replying in Slack does not book it.
 
 ## 5. Doing the work
 1. Crew clock in and out on the visit in the Jobber app.
@@ -55,7 +55,7 @@ Target: every lead quoted within 24 hours.
 3. Something wrong (damage, lockout, missing supplies, unhappy client)? Post in **#wins-and-issues**: Site / What happened / Photo / What you did. Damage or injury: call the manager first.
 4. Client tells you something (extra request, complaint, key change)? Tell the manager; the manager adds it to the client notes in Jobber.
 
-## 6. Hours (manager, daily)
+## 6. Hours (Ali, daily)
 Private. Only Adam and the manager can open the Hours Tracker.
 
 1. Every evening, open the **Log a Shift** form on your phone.
@@ -69,10 +69,10 @@ Private. Only Adam and the manager can open the Hours Tracker.
 2. For each site with hours, enter last week's Jobber visit count and timesheet hours (Jobber > Timesheets / Visits report).
 3. Clear every Flag: visit in Jobber with no hours, hours with no Jobber visit, or hours that differ by more than 30 minutes.
 
-**Every pay period (bi-weekly):**
-1. **Pay Period** tab, Periods back = 1 (the period just ended).
+**Monthly payroll (first business day of the month):**
+1. **Pay Period** tab, Months back = 1 (the month just ended).
 2. Rows flagged must be 0 for everyone.
-3. Run payroll from the Hours and Gross pay columns.
+3. Run payroll from the Hours and Gross pay columns. Rates: Ali $28/h, floaters $25/h (set on the Staff tab).
 
 ## 8. Invoicing and payments
 1. Residential: invoice from Jobber when the visit is completed. Due on receipt, pay online.
@@ -86,6 +86,10 @@ Private. Only Adam and the manager can open the Hours Tracker.
 2. Complaint: re-clean within 48 hours, note it on the client in Jobber, post the result in #wins-and-issues.
 3. Every month: look at one-time clients from 60-90 days ago and offer a recurring clean.
 
+## Team
+- **Ali**: manager. Runs the schedule, assigns open shifts, logs everyone's hours, and works shifts.
+- **Floaters**: cover visits as assigned. Jobber limited-worker access only.
+
 ## 10. Weekly rhythm
 | When | Who | What |
 | --- | --- | --- |
@@ -93,11 +97,10 @@ Private. Only Adam and the manager can open the Hours Tracker.
 | Daily, end of day | Manager | Log shifts in the Hours Tracker form |
 | Daily | Adam | Work #leads; send quotes |
 | Monday | Adam | Weekly cross-check, past-due invoices, quote pipeline |
-| Every 2nd Monday | Adam | Payroll from Pay Period tab |
-| 1st of month | Adam | Commercial invoices |
+| 1st of month | Adam | Monthly payroll from Pay Period tab; commercial invoices |
 
 ## 11. Access and privacy
-- Hours, pay rates and pay totals: Hours Tracker only (Adam + manager). Never in Slack, email or Jobber notes.
+- Hours, pay rates and pay totals: Hours Tracker only (Adam + Ali). Never in Slack, email or Jobber notes.
 - Client payment details: Jobber only.
 - Slack #leads and #management are private (Adam + manager).
 - Crew have Jobber "limited worker" access: their own visits, no prices.
@@ -111,8 +114,7 @@ Private. Only Adam and the manager can open the Hours Tracker.
 | 4 | Clean up duplicate and stale recurring jobs so the Jobber schedule is the real schedule. Crew clock in on Jobber. Turn on the weekly cross-check. Retire Calendar job posts and the monthly client tabs. |
 
 ## Open questions for Adam
-1. Pay period: bi-weekly? Which Monday does it start on?
-2. Open shifts: first come, first served, or manager-assigned?
-3. BC: recent clients are all Yellowknife in Jobber. Is BC work running outside Jobber, or paused?
-4. Does the Jobber plan include time tracking and Zapier?
-5. NACC: no invoice since mid-August. Missed invoice or no work?
+1. BC: recent clients are all Yellowknife in Jobber. Is BC work running outside Jobber, or paused?
+2. Does the Jobber plan include time tracking and Zapier?
+3. NACC (Northern Arts and Cultural Centre): last invoice #1487 (July 24, $945) is still unpaid, and nothing was invoiced for August or September. Was there work those months?
+4. Floater names, to replace the placeholders on the Staff tab.
