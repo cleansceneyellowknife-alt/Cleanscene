@@ -22,7 +22,7 @@ Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), j
 ## Repository map
 - `docs/SOP.md` — the operating SOP (mirrors the claude.ai doc "CleanScene Operating System SOP").
 - `hours-tracker/` — workbook generator, the generated .xlsx, and the Apps Script shift-entry web form.
-- `slack/` — Slack app manifest, channel definitions, and `setup_slack.py` to create/pin channels.
+- `slack/` — channel definitions, live workspace IDs (`workspace.md`), and a bot-token fallback (`manifest.yml`, `setup_slack.py`). The live workspace was built 2026-10-10 via the claude.ai Slack connector.
 - `zapier/zaps.md` — exact Zap specs (no-code; built in the Zapier UI).
 - `jobber/` — Jobber settings checklist and a draft of standard quote terms.
 

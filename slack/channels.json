@@ -1,5 +1,5 @@
 {
-  "_note": "The 8 fixed CleanScene channels. Client conversations stay in Jobber. Hours and pay never go in Slack except #management.",
+  "_note": "The 8 fixed CleanScene channels. Client conversations stay in Jobber. Hours and pay never go in Slack except #management. Live IDs are in slack/workspace.md. In the live workspace, #announcements is Slack's default #all-cleanscene channel.",
   "channels": [
     {
       "name": "announcements",

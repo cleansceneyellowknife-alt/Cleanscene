@@ -17,7 +17,7 @@ Goal: every Facebook lead lands in Jobber within a minute and the team sees it.
 | 3 | Formatter - Phone - Format | Format: +1 (###) ###-####. |
 | 4 | Jobber - Find Client (search by email) | Email = lead email. Tick "Create Jobber Client if it doesn't exist yet": First name, Last name, Email, Phone, Lead source = "Facebook". Tag: `Lead-Facebook` plus the region tag (`YK` or `BC`) from the form's city question. |
 | 5 | Jobber - Create Request | Client = step 4 ID. Title = "{Service type} - {City}". Details: every form answer (service type, home size / sq ft, preferred date, address, notes). |
-| 6 | Slack - Send Channel Message | Channel: #leads. Message (below). Bot name "CleanScene Ops". |
+| 6 | Slack - Send Channel Message | Channel: #leads (private, ID C0C871V9WF8; add the Zapier app to the channel first). Message (below). Bot name "CleanScene Ops". |
 
 Message:
 ```
