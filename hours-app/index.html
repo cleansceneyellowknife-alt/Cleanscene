@@ -1,626 +1,497 @@
 <title>CleanScene Hours</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: one working column (max 880px) under a sticky bar; tabs switch views, the month drives every view. */
+/* Layout: one phone-first column (max 620px). One screen: week header, Add hours, the week's shifts. Pay and Settings are separate views. */
 :root {
-  --bg: #f3f6f5;          /* cool, faintly spruce-tinted ground */
-  --surface: #ffffff;
-  --sunk: #e8eeec;
-  --ink: #15201d;
-  --muted: #5b6b67;
-  --line: #d3ddda;
-  --accent: #0f6b5c;      /* spruce: the one brand colour */
-  --accent-ink: #ffffff;
-  --accent-soft: #d9eee9;
-  --ok: #2f7a3f;  --ok-soft: #dcefdf;
-  --warn: #9a5b00; --warn-soft: #fbecd2;
-  --bad: #b3261e;  --bad-soft: #f8dcd9;
-  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --r: 10px;
+  --bg: #f2f5f4; --card: #ffffff; --sunk: #e7edeb; --ink: #14201c; --muted: #5e6d69; --line: #d5dedb;
+  --accent: #0f6b5c; --accent-ink: #ffffff; --accent-soft: #dbeee9;
+  --bad: #b3261e; --bad-soft: #f8dedb; --ok: #2f7a3f;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0f1514; --surface: #172020; --sunk: #1f2a29; --ink: #e5eeeb; --muted: #97a8a3; --line: #2c3a38;
-  --accent: #4fc2ac; --accent-ink: #062520; --accent-soft: #173a34;
-  --ok: #7fd08e; --ok-soft: #1b3321; --warn: #f0b45a; --warn-soft: #3a2b12; --bad: #ff8a80; --bad-soft: #401b18;
-  color-scheme: dark } }
+  --bg: #0f1514; --card: #182120; --sunk: #202b29; --ink: #e6eeeb; --muted: #98a9a4; --line: #2d3b39;
+  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0f1514; --surface: #172020; --sunk: #1f2a29; --ink: #e5eeeb; --muted: #97a8a3; --line: #2c3a38;
-  --accent: #4fc2ac; --accent-ink: #062520; --accent-soft: #173a34;
-  --ok: #7fd08e; --ok-soft: #1b3321; --warn: #f0b45a; --warn-soft: #3a2b12; --bad: #ff8a80; --bad-soft: #401b18;
-  color-scheme: dark }
+  --bg: #0f1514; --card: #182120; --sunk: #202b29; --ink: #e6eeeb; --muted: #98a9a4; --line: #2d3b39;
+  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark }
 
 * { box-sizing: border-box }
-body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
-.wrap { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
-h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
-h2 { font-size: 1.05rem; font-weight: 700; letter-spacing: .01em }
-.num, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--ink); font: 16px/1.45 var(--body) }
+.wrap { max-width: 620px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 56px; display: grid; gap: 16px }
+h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
 .muted { color: var(--muted) }
 .small { font-size: .85rem }
+.stack { display: grid; gap: 16px }
 
-/* Top bar */
-.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
-.bar-in { max-width: 880px; margin: 0 auto; padding: 12px 16px 0; display: grid; gap: 10px }
-.brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap }
-.brand h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: -.01em }
-.brand h1 span { color: var(--accent) }
-.month { display: flex; align-items: center; gap: 4px }
-.month b { font-family: var(--font-display); font-weight: 700; min-width: 9.5ch; text-align: center }
-.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none }
-.tab { appearance: none; border: 0; background: none; color: var(--muted); font: 600 .92rem var(--font-body); padding: 8px 12px 10px; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap }
-.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent) }
-.tab .count { font-family: var(--font-mono); font-size: .75rem; background: var(--bad-soft); color: var(--bad); border-radius: 99px; padding: 0 6px; margin-left: 4px }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap }
+header h1 { font-size: 1.3rem; font-weight: 800 }
+header h1 span { color: var(--accent) }
+.views { display: flex; gap: 4px; background: var(--sunk); padding: 3px; border-radius: 10px }
+.views button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font: 600 .9rem var(--body); color: var(--muted); cursor: pointer }
+.views button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08) }
 
-/* Controls */
-button, .btn { font: 600 .92rem var(--font-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; cursor: pointer }
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
-button.ghost { background: none; border-color: transparent; padding: 6px 10px }
-button.danger { color: var(--bad); border-color: var(--bad) }
-button:disabled { opacity: .55; cursor: default }
-button:focus-visible, input:focus-visible, select:focus-visible, .tab:focus-visible, .row:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
-label { display: grid; gap: 4px; font-size: .82rem; font-weight: 600; color: var(--muted); letter-spacing: .02em }
-input, select { font: 400 1rem var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; min-width: 0 }
-input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent) }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px }
+.period { display: flex; align-items: center; justify-content: space-between; gap: 8px }
+.period b { font-family: var(--display); font-size: 1.05rem }
+.total { font: 500 1.6rem var(--mono); font-variant-numeric: tabular-nums }
+.people { display: flex; flex-wrap: wrap; gap: 8px }
+.people span { background: var(--sunk); border-radius: 99px; padding: 3px 10px; font-size: .88rem }
+.people span b { font-family: var(--mono); font-weight: 500; margin-left: 6px }
 
-section { display: grid; gap: 14px; padding-top: 18px }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 14px }
-.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) }
-.row-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+label { display: grid; gap: 5px; font-size: .8rem; font-weight: 600; color: var(--muted); letter-spacing: .02em }
+input { font: 400 1rem var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; min-width: 0 }
+.three { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px }
+@media (max-width: 420px) { .three { grid-template-columns: 1fr 1fr } .three > :first-child { grid-column: 1 / -1 } }
 .chips { display: flex; flex-wrap: wrap; gap: 8px }
-.chip { border-radius: 99px; padding: 6px 12px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; cursor: pointer }
+.chip { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 8px 14px; font: 600 .95rem var(--body); cursor: pointer }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
-.note { padding: 10px 12px; border-radius: 8px; background: var(--sunk); font-size: .9rem }
-.note.ok { background: var(--ok-soft); color: var(--ok) }
-.note.bad { background: var(--bad-soft); color: var(--bad) }
+.addr { font-size: .85rem; color: var(--muted); margin-top: -6px }
+button { font: 600 .95rem var(--body); cursor: pointer; border-radius: 10px }
+.btn { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 14px }
+.btn.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.primary { border: 0; background: var(--accent); color: var(--accent-ink); padding: 13px 16px; font-size: 1rem; width: 100% }
+.link { border: 0; background: none; color: var(--accent); padding: 4px 0; text-decoration: underline; text-underline-offset: 3px }
+.danger { color: var(--bad) }
+button:disabled { opacity: .55; cursor: default }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
+.msg { font-size: .9rem }
+.msg:empty { display: none }
+.msg.ok { color: var(--ok) } .msg.bad { color: var(--bad) }
 
-/* Summary strip */
-.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden }
-.strip div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px }
-.strip b { font: 500 1.45rem var(--font-mono); font-variant-numeric: tabular-nums }
-.strip span { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600 }
+.day { display: grid; gap: 8px }
+.day h3 { margin: 6px 2px 0; font: 600 .78rem var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; justify-content: space-between }
+.shift { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-align: left; width: 100%; color: var(--ink); font: inherit; cursor: pointer }
+.shift.flag { border-color: var(--bad); box-shadow: inset 4px 0 0 var(--bad) }
+.shift .client { font-weight: 600; min-width: 0; overflow-wrap: anywhere }
+.shift .hrs { font: 500 1.05rem var(--mono); text-align: right; white-space: nowrap }
+.shift .sub { grid-column: 1 / -1; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere }
+.shift .warn { grid-column: 1 / -1; font-size: .85rem; color: var(--bad); font-weight: 600 }
+.edit { display: grid; gap: 12px; padding: 14px; border: 2px solid var(--accent); border-radius: 12px; background: var(--card) }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+.empty { text-align: center; color: var(--muted); padding: 20px 8px }
 
-/* Shift list */
-.day { display: grid; gap: 6px }
-.day h3 { font: 600 .8rem var(--font-body); color: var(--muted); text-transform: uppercase; letter-spacing: .08em; padding: 6px 2px 0 }
-.row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line); border-radius: 8px; padding: 10px 12px; cursor: pointer; text-align: left; width: 100% }
-.row.flag { border-left-color: var(--bad) }
-.row.cancelled { opacity: .6 }
-.row .who { font-weight: 600; min-width: 0 }
-.row .where { color: var(--muted); font-size: .9rem; min-width: 0; overflow-wrap: anywhere }
-.row .hrs { font: 500 1.05rem var(--font-mono); text-align: right }
-.row .meta { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; align-items: center }
-.pill { font: 600 .72rem var(--font-body); text-transform: uppercase; letter-spacing: .05em; padding: 2px 8px; border-radius: 99px; background: var(--sunk); color: var(--muted); white-space: nowrap }
-.pill.ok { background: var(--ok-soft); color: var(--ok) }
-.pill.warn { background: var(--warn-soft); color: var(--warn) }
-.pill.bad { background: var(--bad-soft); color: var(--bad) }
-
-/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: .95rem }
+th { text-align: left; font: 600 .74rem var(--body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line) }
+td { padding: 10px 8px; border-bottom: 1px solid var(--line) }
+.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap }
+tfoot td { font-weight: 600; border: 0 }
 .tbl { overflow-x: auto }
-table { border-collapse: collapse; width: 100%; font-size: .93rem }
-th { text-align: left; font: 600 .75rem var(--font-body); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap }
-td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle }
-td.n, th.n { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums }
-tfoot td { font-weight: 600; border-bottom: 0 }
-.empty { text-align: center; padding: 28px 16px; color: var(--muted) }
-
-.editor { border: 2px solid var(--accent) }
-@media (max-width: 520px) { .brand h1 { font-size: 1.2rem } .row { grid-template-columns: 1fr } .row .hrs, .row .meta { text-align: left; justify-content: flex-start } }
-@media (prefers-reduced-motion: no-preference) { .row { transition: border-color .15s } }
+.list-edit { display: grid; gap: 8px }
+.list-edit .item { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 8px; align-items: center }
+@media (max-width: 480px) { .list-edit .item { grid-template-columns: 1fr } }
 </style>
 
-<header class="bar">
-  <div class="bar-in">
-    <div class="brand">
-      <h1>CleanScene <span>Hours</span></h1>
-      <div class="month" aria-label="Month">
-        <button class="ghost" id="prevMonth" aria-label="Previous month">&#8249;</button>
-        <b id="monthLabel">This month</b>
-        <button class="ghost" id="nextMonth" aria-label="Next month">&#8250;</button>
-      </div>
-    </div>
-    <nav class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tab-log" aria-selected="true" data-view="log">Log</button>
-      <button class="tab" role="tab" id="tab-shifts" aria-selected="false" data-view="shifts">Shifts<span class="count" id="flagCount" hidden>0</span></button>
-      <button class="tab" role="tab" id="tab-pay" aria-selected="false" data-view="pay" hidden>Pay</button>
-      <button class="tab" role="tab" id="tab-setup" aria-selected="false" data-view="setup">Crew &amp; clients</button>
-    </nav>
-  </div>
-</header>
-
 <main class="wrap">
-  <div id="gate" class="note" style="margin-top:18px">Loading CleanScene Hours. This page is private to Adam and Ali.</div>
+  <header>
+    <h1>CleanScene <span>Hours</span></h1>
+    <nav class="views" id="views" hidden>
+      <button id="vHours" aria-pressed="true" data-v="hours">Hours</button>
+      <button id="vPay" aria-pressed="false" data-v="pay" hidden>Pay</button>
+      <button id="vSet" aria-pressed="false" data-v="settings">Settings</button>
+    </nav>
+  </header>
 
-  <!-- LOG -->
-  <section id="view-log" hidden>
-    <div class="strip" id="logStrip"></div>
+  <p id="gate" class="card muted" style="margin:0">Loading. This page is private to CleanScene management.</p>
 
-    <form class="panel" id="shiftForm" autocomplete="off">
-      <h2>Log a shift</h2>
-      <div class="grid">
-        <label>Date<input type="date" id="fDate" required></label>
-        <label>Start<input type="time" id="fStart" required></label>
-        <label>End<input type="time" id="fEnd" required></label>
-        <label>Break (min)<input type="number" id="fBreak" min="0" max="240" step="5" value="0" inputmode="numeric"></label>
+  <!-- HOURS -->
+  <div id="pHours" class="stack" hidden>
+    <section class="card" aria-label="Week summary">
+      <div class="period">
+        <button class="btn" id="wPrev" aria-label="Previous week">&#8249;</button>
+        <div style="text-align:center"><b id="wLabel">This week</b><div class="small muted" id="wSub"></div></div>
+        <button class="btn" id="wNext" aria-label="Next week">&#8250;</button>
       </div>
-      <label>Client / site<input id="fSite" list="siteList" required placeholder="Start typing a client"></label>
-      <datalist id="siteList"></datalist>
-      <div id="fAddr" class="small muted" aria-live="polite"></div>
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
+        <div><div class="small muted">Total hours</div><div class="total" id="wTotal">0.00</div></div>
+        <button class="btn" id="calBtn" hidden>Bring in from calendar</button>
+      </div>
+      <div class="people" id="wPeople"></div>
+      <div class="msg" id="calMsg" role="status"></div>
+    </section>
+
+    <form class="card" id="addForm" autocomplete="off">
+      <h2 style="font-size:1.1rem">Add hours</h2>
+      <label>Client<input id="aClient" list="clientList" required placeholder="Type a client name"></label>
+      <div class="addr" id="aAddr"></div>
+      <datalist id="clientList"></datalist>
+      <div class="three">
+        <label>Date<input type="date" id="aDate" required></label>
+        <label>Start<input type="time" id="aStart" required></label>
+        <label>End<input type="time" id="aEnd" required></label>
+      </div>
       <div style="display:grid;gap:6px">
-        <span class="small muted" style="font-weight:600">Who worked (tap everyone on the crew)</span>
-        <div class="chips" id="fCrew"></div>
+        <span class="small muted" style="font-weight:600">Who worked</span>
+        <div class="chips" id="aWho"></div>
       </div>
-      <label>Note (optional)<input id="fNote" maxlength="140" placeholder="Jobber visit #, extra work, anything Adam should know"></label>
-      <div class="row-actions">
-        <button class="primary" type="submit" id="fSave">Save shift</button>
-        <span id="fMsg" class="small" role="status"></span>
-      </div>
+      <button class="primary" id="aSave" type="submit">Save</button>
+      <div class="msg" id="aMsg" role="status"></div>
     </form>
 
-    <div class="panel" id="calPanel" hidden>
-      <h2>Pull shifts from Google Calendar</h2>
-      <p class="small muted" style="margin:0">Every job on the calendar with crew invited becomes one shift per person, at the scheduled times. Shifts already logged are skipped. Then fix anything that ran long, short or was cancelled.</p>
-      <div class="grid">
-        <label>From<input type="date" id="cFrom"></label>
-        <label>To<input type="date" id="cTo"></label>
-      </div>
-      <div class="row-actions">
-        <button class="primary" id="cPull">Pull shifts</button>
-        <span id="cMsg" class="small" role="status"></span>
-      </div>
-    </div>
+    <section id="dayList" class="stack" style="gap:12px" aria-label="Shifts this week"></section>
+  </div>
 
-    <div class="panel">
-      <h2>Needs a look this month</h2>
-      <div id="needsList" class="day"></div>
-    </div>
-  </section>
-
-  <!-- SHIFTS -->
-  <section id="view-shifts" hidden>
-    <div class="row-actions">
-      <div class="chips" id="shiftFilters">
-        <button class="chip" aria-pressed="true" data-f="all">All</button>
-        <button class="chip" aria-pressed="false" data-f="flag">Needs a look</button>
+  <!-- PAY (owner only) -->
+  <div id="pPay" class="stack" hidden>
+    <section class="card">
+      <div class="period">
+        <button class="btn" id="mPrev" aria-label="Previous month">&#8249;</button>
+        <b id="mLabel">Month</b>
+        <button class="btn" id="mNext" aria-label="Next month">&#8250;</button>
       </div>
-      <select id="crewFilter" aria-label="Filter by crew member" style="width:auto"></select>
-    </div>
-    <div id="editor"></div>
-    <div id="shiftList" style="display:grid;gap:14px"></div>
-  </section>
-
-  <!-- PAY -->
-  <section id="view-pay" hidden>
-    <div class="strip" id="payStrip"></div>
-    <div class="panel">
-      <h2>Payroll for <span id="payMonth"></span></h2>
-      <p class="small muted" style="margin:0">Pay is monthly. Cancelled shifts are left out. Pay once "Needs a look" is 0 for everyone.</p>
       <div class="tbl"><table>
-        <thead><tr><th>Crew</th><th class="n">Shifts</th><th class="n">Hours</th><th class="n">Rate</th><th class="n">Gross</th><th class="n">Needs a look</th></tr></thead>
+        <thead><tr><th>Person</th><th class="n">Hours</th><th class="n">Rate</th><th class="n">Pay</th></tr></thead>
         <tbody id="payBody"></tbody><tfoot id="payFoot"></tfoot>
       </table></div>
-    </div>
-    <div class="panel">
-      <h2>Hours by client</h2>
-      <p class="small muted" style="margin:0">Use this on the 1st to check that every client with hours has an invoice in Jobber.</p>
+      <div class="msg bad" id="payWarn"></div>
+    </section>
+    <section class="card">
+      <h2 style="font-size:1.05rem">Hours by client</h2>
+      <p class="small muted" style="margin:0">Every client here needs an invoice in Jobber for this month.</p>
       <div class="tbl"><table>
-        <thead><tr><th>Client / site</th><th class="n">Visits</th><th class="n">Crew hours</th></tr></thead>
-        <tbody id="siteBody"></tbody>
+        <thead><tr><th>Client</th><th class="n">Visits</th><th class="n">Hours</th></tr></thead>
+        <tbody id="clientBody"></tbody>
       </table></div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- SETUP -->
-  <section id="view-setup" hidden>
-    <div class="panel">
-      <h2>Crew</h2>
-      <p class="small muted" style="margin:0">Calendar emails link calendar invites to the right person.</p>
-      <div class="tbl"><table>
-        <thead><tr><th>Name</th><th>Role</th><th class="n owner-only" hidden>Rate $/h</th><th>Calendar emails</th><th>Active</th><th></th></tr></thead>
-        <tbody id="crewBody"></tbody>
-      </table></div>
-      <form class="row-actions" id="crewAdd">
-        <input id="caName" placeholder="New crew member name" style="flex:1 1 180px" required>
-        <input id="caRate" class="owner-only" hidden type="number" step="0.25" min="0" placeholder="Rate $/h" style="flex:0 1 110px">
-        <button type="submit">Add crew</button>
+  <!-- SETTINGS -->
+  <div id="pSet" class="stack" hidden>
+    <section class="card">
+      <h2 style="font-size:1.05rem">Crew</h2>
+      <p class="small muted" style="margin:0">Calendar emails let "Bring in from calendar" know who worked.</p>
+      <div class="list-edit" id="crewList"></div>
+      <form class="row" id="crewAdd"><input id="cName" placeholder="New person's name" required style="flex:1 1 200px"><button class="btn" type="submit">Add person</button></form>
+    </section>
+    <section class="card">
+      <h2 style="font-size:1.05rem">Clients</h2>
+      <input id="sSearch" placeholder="Search clients" aria-label="Search clients">
+      <div class="list-edit" id="siteListEl"></div>
+      <form class="row" id="siteAdd">
+        <input id="sName" placeholder="Client name (as in Jobber)" required style="flex:1 1 200px">
+        <input id="sAddr" placeholder="Address" style="flex:1 1 200px">
+        <button class="btn" type="submit">Add client</button>
       </form>
-    </div>
-    <div class="panel">
-      <h2>Clients &amp; sites</h2>
-      <p class="small muted" style="margin:0">Use the client's name exactly as in Jobber. Calendar words: words in a calendar event that mean this client (for example "day care" or "hospital").</p>
-      <input id="siteSearch" placeholder="Search clients" aria-label="Search clients">
-      <div class="tbl"><table>
-        <thead><tr><th>Client / site</th><th>Address</th><th>Type</th><th>Calendar words</th><th>Active</th></tr></thead>
-        <tbody id="sitesBody"></tbody>
-      </table></div>
-      <form class="row-actions" id="siteAdd">
-        <input id="saName" placeholder="New client name (as in Jobber)" style="flex:1 1 220px" required>
-        <select id="saType" style="flex:0 1 150px"><option>Residential</option><option>Commercial</option></select>
-        <input id="saAddr" placeholder="Address" style="flex:1 1 200px">
-        <input id="saWords" placeholder="Calendar words, comma separated" style="flex:1 1 200px">
-        <button type="submit">Add client</button>
-      </form>
-    </div>
-  </section>
+      <div class="msg" id="sMsg" role="status"></div>
+    </section>
+  </div>
 </main>
 
 <script>
 (() => {
   "use strict";
-  // ---------- helpers ----------
   const $ = (id) => document.getElementById(id);
   const h = (tag, attrs, ...kids) => {
     const el = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs || {})) {
       if (v == null || v === false) continue;
-      if (k === "class") el.className = v;
-      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
-      else if (k === "text") el.textContent = v;
-      else el.setAttribute(k, v === true ? "" : v);
+      if (k === "class") el.className = v; else if (k === "text") el.textContent = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v === true ? "" : v);
     }
-    for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : String(kid));
+    for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : String(c));
     return el;
   };
   const pad = (n) => String(n).padStart(2, "0");
   const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  const today = () => ymd(new Date());
+  const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const mondayOf = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return addDays(x, -((x.getDay() + 6) % 7)); };
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const money = (n) => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const hrs = (n) => (Math.round(n * 100) / 100).toFixed(2);
+  const dayName = (s) => parse(s).toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" });
+  const t12 = (t) => { if (!t) return "--"; let [a, b] = t.split(":").map(Number); const p = a >= 12 ? "pm" : "am"; a = a % 12 || 12; return b ? `${a}:${pad(b)}${p}` : `${a}${p}`; };
   const toMin = (t) => { if (!t) return null; const [a, b] = t.split(":").map(Number); return a * 60 + b; };
-  const prettyDate = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" }); };
-  const prettyTime = (t) => { if (!t) return "--"; let [a, b] = t.split(":").map(Number); const ap = a >= 12 ? "pm" : "am"; a = a % 12 || 12; return `${a}:${pad(b)}${ap}`; };
-  const shiftHours = (s) => {
-    const a = toMin(s.start), b = toMin(s.end);
-    if (a == null || b == null) return null;
-    const mins = (b - a + 1440) % 1440;
-    return Math.round((mins / 60 - (Number(s.breakMin) || 0) / 60) * 100) / 100;
-  };
-  const words = (v) => String(v || "").split(",").map((w) => w.trim().toLowerCase()).filter(Boolean);
-  const safeStore = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+  const hoursOf = (s) => { const a = toMin(s.start), b = toMin(s.end); if (a == null || b == null) return 0; return Math.round((((b - a + 1440) % 1440) - (Number(s.breakMin) || 0)) / 60 * 100) / 100; };
+  const fmt = (n) => (Math.round(n * 100) / 100).toFixed(2);
+  const money = (n) => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const errText = (e) => e && e.code === "invalid_argument" ? "You don't have permission to change this." : e && e.code === "quota_exceeded" ? "Storage is full." : "Couldn't save. Check your connection and try again.";
 
-  // ---------- state ----------
-  const S = { db: null, crew: [], sites: [], shifts: [], month: null, view: safeStore.get("csh.view") || "log",
-              filter: "all", crewFilter: "", editing: null, isOwner: false, rates: {}, delArm: false, unsubShifts: null, canWrite: true };
-  const now = new Date();
-  S.month = { y: now.getFullYear(), m: now.getMonth() };
-  const monthRange = () => {
-    const { y, m } = S.month;
-    const last = new Date(y, m + 1, 0).getDate();
-    return [`${y}-${pad(m + 1)}-01`, `${y}-${pad(m + 1)}-${pad(last)}`];
-  };
-  const addrOf = (name) => (S.sites.find((x) => x.name === name) || {}).address || "";
-  const rateOf = (id) => Number(S.rates[id]) || 0;
-  const crewById = () => Object.fromEntries(S.crew.map((c) => [c.id, c]));
-  const siteNames = () => new Set(S.sites.map((s) => s.name));
+  const S = { db: null, owner: false, view: "hours", crew: [], sites: [], rates: {}, week: [], month: [], editing: null, confirmDel: false,
+    weekStart: mondayOf(new Date()), monthStart: (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })(), unsubW: null, unsubM: null };
+  const crewName = (id) => (S.crew.find((c) => c.id === id) || {}).name || "Unknown";
+  const site = (name) => S.sites.find((x) => x.name === name);
+  const live = (list) => list.filter((s) => s.status !== "cancelled");
 
-  function flagsFor(list) {
-    const crew = crewById(), sites = siteNames(), dup = {};
-    const live = list.filter((s) => s.status !== "cancelled");
-    for (const s of live) { const k = `${s.date}|${s.crew}|${s.site}`; dup[k] = (dup[k] || 0) + 1; }
-    const out = new Map();
-    for (const s of list) {
-      if (s.status === "cancelled") { out.set(s.id, null); continue; }
-      const hh = shiftHours(s);
-      let f = null;
-      if (!s.crew || !s.site || !s.start || !s.end) f = "Missing info";
-      else if (!crew[s.crew]) f = "Unknown crew";
-      else if (!sites.has(s.site)) f = "Pick the client";
-      else if (hh <= 0) f = "Check times";
-      else if (hh > 12) f = "Over 12 h";
-      else if (dup[`${s.date}|${s.crew}|${s.site}`] > 1) f = "Logged twice?";
-      out.set(s.id, f);
-    }
-    return out;
+  function problem(s, list) {
+    if (!s.site || !s.start || !s.end || !s.crew) return "Missing details";
+    if (!site(s.site)) return "Tap to pick the client from the list";
+    const hh = hoursOf(s);
+    if (hh <= 0) return "Check the times";
+    if (hh > 12) return "Over 12 hours: check the times";
+    if (list.filter((x) => x.status !== "cancelled" && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
+    return "";
   }
 
-  // ---------- rendering ----------
-  function setView(v) {
-    S.view = v; safeStore.set("csh.view", v);
-    for (const t of document.querySelectorAll(".tab")) t.setAttribute("aria-selected", String(t.dataset.view === v));
-    for (const id of ["log", "shifts", "pay", "setup"]) $("view-" + id).hidden = id !== v || !S.db || (id === "pay" && !S.isOwner);
+  // ---------- views ----------
+  function show(v) {
+    if (v === "pay" && !S.owner) v = "hours";
+    S.view = v;
+    for (const b of $("views").children) b.setAttribute("aria-pressed", String(b.dataset.v === v));
+    $("pHours").hidden = v !== "hours"; $("pPay").hidden = v !== "pay"; $("pSet").hidden = v !== "settings";
+    if (v === "pay") subMonth();
+    render();
   }
-
   function render() {
-    const { y, m } = S.month;
-    $("monthLabel").textContent = `${MONTHS[m].slice(0, 3)} ${y}`;
-    const flags = flagsFor(S.shifts);
-    const nFlag = [...flags.values()].filter(Boolean).length;
-    $("flagCount").hidden = nFlag === 0; $("flagCount").textContent = nFlag;
-    renderLog(flags, nFlag); renderShifts(flags); renderPay(flags); renderSetup();
+    if (!S.db) return;
+    if (S.view === "hours") renderHours();
+    if (S.view === "pay") renderPay();
+    if (S.view === "settings") renderSettings();
   }
 
-  function totals(flags) {
-    const live = S.shifts.filter((s) => s.status !== "cancelled");
-    const hours = live.reduce((a, s) => a + (shiftHours(s) || 0), 0);
-    return { hours, shifts: live.length, flagged: [...flags.values()].filter(Boolean).length };
-  }
+  function renderHours() {
+    const ws = S.weekStart, we = addDays(ws, 6);
+    $("wLabel").textContent = ymd(ws) === ymd(mondayOf(new Date())) ? "This week" : `Week of ${MON[ws.getMonth()]} ${ws.getDate()}`;
+    $("wSub").textContent = `${MON[ws.getMonth()]} ${ws.getDate()} – ${MON[we.getMonth()]} ${we.getDate()}`;
+    const L = live(S.week);
+    $("wTotal").textContent = fmt(L.reduce((a, s) => a + hoursOf(s), 0));
+    const per = {};
+    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
+    $("wPeople").replaceChildren(...Object.entries(per).sort((a, b) => b[1] - a[1]).map(([id, v]) => h("span", {}, crewName(id), h("b", { text: fmt(v) }))));
 
-  function strip(el, items) {
-    el.replaceChildren(...items.map(([v, l]) => h("div", {}, h("b", { text: v }), h("span", { text: l }))));
-  }
+    const picked = new Set([...$("aWho").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id));
+    $("aWho").replaceChildren(...S.crew.filter((c) => c.active !== false).map((c) => h("button", { type: "button", class: "chip", "data-id": c.id,
+      "aria-pressed": String(picked.has(c.id)), onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
+    $("clientList").replaceChildren(...S.sites.filter((x) => x.active !== false).sort((a, b) => a.name.localeCompare(b.name)).map((x) => h("option", { value: x.name, label: x.address || "" })));
 
-  function renderLog(flags, nFlag) {
-    const t = totals(flags);
-    strip($("logStrip"), [[hrs(t.hours), "Crew hours this month"], [String(t.shifts), "Shifts"], [String(nFlag), "Need a look"]]);
-    // crew chips (keep selection)
-    const sel = new Set([...$("fCrew").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id));
-    $("fCrew").replaceChildren(...S.crew.filter((c) => c.active !== false).map((c) =>
-      h("button", { type: "button", class: "chip", "data-id": c.id, "aria-pressed": String(sel.has(c.id)),
-        onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
-    if (!S.crew.length) $("fCrew").append(h("span", { class: "small muted", text: "Add crew on the Crew & clients tab first." }));
-    $("siteList").replaceChildren(...S.sites.filter((s) => s.active !== false).map((s) => h("option", { value: s.name, label: s.address || "" })));
-    const crew = crewById();
-    const needs = S.shifts.filter((s) => flags.get(s.id)).sort((a, b) => a.date.localeCompare(b.date));
-    $("needsList").replaceChildren(...(needs.length ? needs.map((s) => shiftRow(s, flags.get(s.id), crew, true))
-      : [h("div", { class: "note ok", text: "Nothing to fix. Every shift this month checks out." })]));
-  }
-
-  function shiftRow(s, flag, crew, withDate) {
-    const hh = shiftHours(s);
-    const status = s.status === "cancelled" ? h("span", { class: "pill", text: "Cancelled" })
-      : s.status === "confirmed" ? h("span", { class: "pill ok", text: "Confirmed" })
-      : s.source === "calendar" ? h("span", { class: "pill", text: "From calendar" }) : h("span", { class: "pill ok", text: "Logged" });
-    return h("button", { type: "button", class: "row" + (flag ? " flag" : "") + (s.status === "cancelled" ? " cancelled" : ""),
-        onclick: () => { S.editing = s.id; S.delArm = false; setView("shifts"); render(); $("editor").scrollIntoView({ block: "start" }); } },
-      h("div", { class: "who" }, (crew[s.crew]?.name || "Unknown crew") + (withDate ? ` · ${prettyDate(s.date)}` : "")),
-      h("div", { class: "hrs" }, hh == null ? "--" : `${hrs(hh)} h`),
-      h("div", { class: "where" }, `${s.site || "No client"}${addrOf(s.site) ? ` (${addrOf(s.site)})` : ""} · ${prettyTime(s.start)}–${prettyTime(s.end)}${Number(s.breakMin) ? ` · ${s.breakMin} min break` : ""}${s.note ? ` · ${s.note}` : ""}`),
-      h("div", { class: "meta" }, flag ? h("span", { class: "pill bad", text: flag }) : null, status));
-  }
-
-  function renderShifts(flags) {
-    const crew = crewById();
-    const cf = $("crewFilter"), cur = S.crewFilter;
-    cf.replaceChildren(h("option", { value: "" }, "Everyone"), ...S.crew.map((c) => h("option", { value: c.id, selected: c.id === cur }, c.name)));
-    for (const b of $("shiftFilters").children) b.setAttribute("aria-pressed", String(b.dataset.f === S.filter));
-    renderEditor(crew);
-    let list = S.shifts.slice();
-    if (S.filter === "flag") list = list.filter((s) => flags.get(s.id));
-    if (S.crewFilter) list = list.filter((s) => s.crew === S.crewFilter);
-    list.sort((a, b) => b.date.localeCompare(a.date) || (a.start || "").localeCompare(b.start || ""));
+    if (S.editing && $("dayList").querySelector(".edit") && $("dayList").contains(document.activeElement)) return; // keep an open edit as typed
     const days = new Map();
-    for (const s of list) { if (!days.has(s.date)) days.set(s.date, []); days.get(s.date).push(s); }
-    if (!days.size) {
-      $("shiftList").replaceChildren(h("div", { class: "empty" }, S.shifts.length ? "No shifts match this filter." :
-        "No shifts this month yet. Log one on the Log tab, or pull them from Google Calendar."));
-      return;
+    for (const s of [...S.week].sort((a, b) => b.date.localeCompare(a.date) || (a.start || "").localeCompare(b.start || ""))) {
+      if (!days.has(s.date)) days.set(s.date, []); days.get(s.date).push(s);
     }
-    $("shiftList").replaceChildren(...[...days].map(([d, ss]) => {
-      const tot = ss.filter((s) => s.status !== "cancelled").reduce((a, s) => a + (shiftHours(s) || 0), 0);
-      return h("div", { class: "day" }, h("h3", {}, `${prettyDate(d)} · ${hrs(tot)} h`), ...ss.map((s) => shiftRow(s, flags.get(s.id), crew, false)));
-    }));
+    if (!days.size) { $("dayList").replaceChildren(h("div", { class: "empty" }, "No hours this week yet. Add them above, or tap Bring in from calendar.")); return; }
+    $("dayList").replaceChildren(...[...days].map(([d, list]) => h("div", { class: "day" },
+      h("h3", {}, h("span", { text: dayName(d) }), h("span", { class: "num", text: fmt(live(list).reduce((a, s) => a + hoursOf(s), 0)) + " h" })),
+      ...groupVisits(list).map((g) => S.editing === g.key ? editor(g) : visitCard(g)))));
   }
 
-  function renderEditor(crew) {
-    const box = $("editor");
-    const s = S.shifts.find((x) => x.id === S.editing);
-    if (!s) { box.replaceChildren(); return; }
-    // Keep an open editor as typed; rebuild only for a different shift or after a save.
-    if (box.firstChild && box.firstChild.dataset.id === s.id && box.firstChild.dataset.v === String(s.updatedAt || "")) return;
-    const f = { date: s.date, crew: s.crew, site: s.site, start: s.start, end: s.end, breakMin: s.breakMin || 0, note: s.note || "" };
-    const inp = (id, label, type, val, extra = {}) => h("label", {}, label, h("input", { id, type, value: val ?? "", ...extra }));
-    const panel = h("form", { class: "panel editor", id: "editForm", "data-id": s.id, "data-v": String(s.updatedAt || "") },
-      h("div", { class: "row-actions", style: "justify-content:space-between" }, h("h2", { text: "Edit shift" }),
-        h("button", { type: "button", class: "ghost", onclick: () => { S.editing = null; render(); } }, "Close")),
-      h("div", { class: "grid" },
-        inp("eDate", "Date", "date", f.date), inp("eStart", "Start", "time", f.start), inp("eEnd", "End", "time", f.end),
-        inp("eBreak", "Break (min)", "number", f.breakMin, { min: 0, max: 240, step: 5 })),
-      h("label", {}, "Crew", h("select", { id: "eCrew" }, ...S.crew.map((c) => h("option", { value: c.id, selected: c.id === f.crew }, c.name)))),
-      h("label", {}, "Client / site", h("input", { id: "eSite", list: "siteList", value: f.site })),
-      inp("eNote", "Note", "text", f.note, { maxlength: 140 }),
-      s.source === "calendar" ? h("div", { class: "small muted", text: `From calendar: ${s.calTitle || ""}` }) : null,
-      h("div", { class: "row-actions" },
-        h("button", { class: "primary", type: "submit" }, "Save changes"),
-        s.status !== "cancelled" ? h("button", { type: "button", onclick: () => patch(s.id, { status: "cancelled" }, "Shift cancelled. It no longer counts toward pay.") }, "Didn't happen")
-          : h("button", { type: "button", onclick: () => patch(s.id, { status: "confirmed" }, "Shift restored.") }, "Restore"),
-        h("button", { type: "button", class: "danger", onclick: (e) => del(s.id, e.currentTarget) }, S.delArm ? "Tap again to delete" : "Delete"),
-        h("span", { id: "eMsg", class: "small", role: "status" })));
-    panel.addEventListener("submit", (e) => {
+  // One card per visit (same client, date and times), listing everyone who worked it.
+  function groupVisits(list) {
+    const m = new Map();
+    for (const s of list) {
+      const k = `${s.date}|${s.site}|${s.start}|${s.end}|${s.status === "cancelled" ? "x" : ""}`;
+      if (!m.has(k)) m.set(k, { key: k, items: [] });
+      m.get(k).items.push(s);
+    }
+    return [...m.values()];
+  }
+
+  function visitCard(g) {
+    const s = g.items[0], cancelled = s.status === "cancelled";
+    const warn = cancelled ? "" : g.items.map((x) => problem(x, S.week)).find(Boolean) || "";
+    const addr = (site(s.site) || {}).address;
+    return h("button", { type: "button", class: "shift" + (warn ? " flag" : ""), style: cancelled ? "opacity:.55" : null,
+        onclick: () => { S.editing = g.key; S.confirmDel = false; render(); } },
+      h("div", { class: "client", text: (s.site || "No client") + (cancelled ? " (didn't happen)" : "") }),
+      h("div", { class: "hrs", text: g.items.length > 1 ? `${fmt(hoursOf(s))} h × ${g.items.length}` : `${fmt(hoursOf(s))} h` }),
+      h("div", { class: "sub", text: [addr, `${t12(s.start)}–${t12(s.end)}`, g.items.map((x) => crewName(x.crew)).join(", ")].filter(Boolean).join(" · ") }),
+      warn ? h("div", { class: "warn", text: warn }) : null);
+  }
+
+  function editor(g) {
+    const s = g.items[0];
+    const f = h("form", { class: "edit" },
+      h("label", {}, "Client", h("input", { id: "eClient", list: "clientList", value: site(s.site) ? s.site : "", placeholder: s.calTitle ? `Calendar said: ${s.calTitle}` : "Type a client name" })),
+      h("div", { class: "three" },
+        h("label", {}, "Date", h("input", { id: "eDate", type: "date", value: s.date })),
+        h("label", {}, "Start", h("input", { id: "eStart", type: "time", value: s.start || "" })),
+        h("label", {}, "End", h("input", { id: "eEnd", type: "time", value: s.end || "" }))),
+      h("div", { class: "small muted", text: "Worked by " + g.items.map((x) => crewName(x.crew)).join(", ") }),
+      h("div", { class: "row" },
+        h("button", { class: "btn go", type: "submit" }, "Save"),
+        h("button", { class: "btn", type: "button", onclick: () => { S.editing = null; render(); } }, "Close"),
+        s.status === "cancelled"
+          ? h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "confirmed" }) }, "It did happen")
+          : h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "cancelled" }) }, "Didn't happen"),
+        h("button", { class: "link danger", type: "button", onclick: (e) => removeAll(g, e.currentTarget) }, "Delete")),
+      h("div", { class: "msg", id: "eMsg", role: "status" }));
+    f.addEventListener("submit", (e) => {
       e.preventDefault();
-      patch(s.id, { date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, breakMin: Number($("eBreak").value) || 0,
-        crew: $("eCrew").value, site: $("eSite").value.trim(), note: $("eNote").value.trim(), status: "confirmed" }, "Saved.");
+      const name = $("eClient").value.trim();
+      if (!site(name)) { $("eMsg").className = "msg bad"; $("eMsg").textContent = "Pick the client from the list."; return; }
+      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" });
     });
-    box.replaceChildren(panel);
+    return f;
   }
 
-  function renderPay(flags) {
-    const { y, m } = S.month;
-    $("payMonth").textContent = `${MONTHS[m]} ${y}`;
-    const rows = S.crew.map((c) => {
-      const mine = S.shifts.filter((s) => s.crew === c.id && s.status !== "cancelled");
-      const hh = mine.reduce((a, s) => a + (shiftHours(s) || 0), 0);
-      const fl = S.shifts.filter((s) => s.crew === c.id && flags.get(s.id)).length;
-      return { c, n: mine.length, hh, gross: hh * rateOf(c.id), fl };
-    }).filter((r) => r.n || r.c.active !== false);
-    const T = rows.reduce((a, r) => ({ n: a.n + r.n, hh: a.hh + r.hh, gross: a.gross + r.gross, fl: a.fl + r.fl }), { n: 0, hh: 0, gross: 0, fl: 0 });
-    strip($("payStrip"), [[hrs(T.hh), "Crew hours"], [money(T.gross), "Gross pay"], [String(T.fl), "Need a look"]]);
-    $("payBody").replaceChildren(...(rows.length ? rows.map((r) => h("tr", {},
-      h("td", { text: r.c.name }), h("td", { class: "n", text: r.n }), h("td", { class: "n", text: hrs(r.hh) }),
-      h("td", { class: "n", text: money(rateOf(r.c.id)) }), h("td", { class: "n", text: money(r.gross) }),
-      h("td", { class: "n" }, r.fl ? h("span", { class: "pill bad", text: r.fl }) : h("span", { class: "pill ok", text: "0" }))))
-      : [h("tr", {}, h("td", { colspan: 6, class: "empty", text: "No crew yet." }))]));
-    $("payFoot").replaceChildren(h("tr", {}, h("td", { text: "Total" }), h("td", { class: "n", text: T.n }), h("td", { class: "n", text: hrs(T.hh) }),
-      h("td", {}), h("td", { class: "n", text: money(T.gross) }), h("td", { class: "n", text: T.fl })));
-    const bySite = new Map();
-    for (const s of S.shifts) {
-      if (s.status === "cancelled") continue;
-      const k = s.site || "No client";
-      const o = bySite.get(k) || { visits: new Set(), hh: 0 };
-      o.visits.add(`${s.date}|${s.start}`); o.hh += shiftHours(s) || 0; bySite.set(k, o);
-    }
-    const siteRows = [...bySite].sort((a, b) => b[1].hh - a[1].hh);
-    $("siteBody").replaceChildren(...(siteRows.length ? siteRows.map(([k, o]) => h("tr", {}, h("td", { text: k }), h("td", { class: "n", text: o.visits.size }), h("td", { class: "n", text: hrs(o.hh) })))
-      : [h("tr", {}, h("td", { colspan: 3, class: "empty", text: "No hours this month yet." }))]));
+  async function saveAll(g, data) {
+    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: new Date().toISOString() }); S.editing = null; render(); }
+    catch (e) { const m = $("eMsg"); if (m) { m.className = "msg bad"; m.textContent = errText(e); } }
+  }
+  async function removeAll(g, btn) {
+    if (!S.confirmDel) { S.confirmDel = true; btn.textContent = "Tap again to delete"; return; }
+    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).delete(); S.editing = null; S.confirmDel = false; render(); }
+    catch (e) { $("eMsg").className = "msg bad"; $("eMsg").textContent = errText(e); }
   }
 
-  function renderSetup() {
-    const typing = $("view-setup").contains(document.activeElement) && document.activeElement.id !== "siteSearch";
-    if (typing) return; // don't wipe a row someone is editing
-    $("crewBody").replaceChildren(...(S.crew.length ? S.crew.map((c) => {
-      const r = { name: h("input", { value: c.name, "aria-label": "Name" }), role: h("input", { value: c.role || "", "aria-label": "Role" }),
-        rate: h("input", { type: "number", step: "0.25", min: "0", value: S.rates[c.id] ?? "", "aria-label": "Rate", style: "max-width:100px" }),
-        emails: h("input", { value: (c.emails || []).join(", "), "aria-label": "Calendar emails" }),
-        active: h("input", { type: "checkbox", checked: c.active !== false, "aria-label": "Active" }) };
-      const msg = h("span", { class: "small", role: "status" });
-      return h("tr", {}, h("td", {}, r.name), h("td", {}, r.role), S.isOwner ? h("td", { class: "n" }, r.rate) : null, h("td", {}, r.emails), h("td", {}, r.active),
-        h("td", {}, h("button", { type: "button", onclick: async () => {
-          try { await S.db.doc("crew/" + c.id).update({ name: r.name.value.trim(), role: r.role.value.trim(),
-            emails: words(r.emails.value), active: r.active.checked });
-            if (S.isOwner && String(S.rates[c.id] ?? "") !== r.rate.value) await S.db.doc("rates/" + c.id).set({ rate: Number(r.rate.value) || 0 });
-            msg.textContent = "Saved"; }
-          catch (e) { msg.textContent = writeError(e); } } }, "Save"), msg));
-    }) : [h("tr", {}, h("td", { colspan: 6, class: "empty", text: "No crew yet. Add the first person below." }))]));
-    const q = ($("siteSearch").value || "").toLowerCase();
-    const list = S.sites.filter((s) => !q || s.name.toLowerCase().includes(q) || (s.address || "").toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name));
-    $("sitesBody").replaceChildren(...(list.length ? list.map((s) => {
-      const kw = h("input", { value: (s.keywords || []).join(", "), "aria-label": "Calendar words" });
-      kw.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ keywords: words(kw.value) }).catch(() => {}));
-      const act = h("input", { type: "checkbox", checked: s.active !== false, "aria-label": "Active" });
-      act.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ active: act.checked }).catch(() => {}));
-      const ad = h("input", { value: s.address || "", "aria-label": "Address" });
-      ad.addEventListener("change", () => S.db.doc("sites/" + s.id).update({ address: ad.value.trim() }).catch(() => {}));
-      return h("tr", {}, h("td", { text: s.name }), h("td", {}, ad), h("td", { class: "small", text: s.type || "" }), h("td", {}, kw), h("td", {}, act));
-    }) : [h("tr", {}, h("td", { colspan: 5, class: "empty", text: q ? "No client matches that search." : "No clients yet." }))]));
+  // ---------- pay (owner only) ----------
+  function renderPay() {
+    const ms = S.monthStart;
+    $("mLabel").textContent = `${MONTHS[ms.getMonth()]} ${ms.getFullYear()}`;
+    const L = live(S.month), per = {};
+    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
+    const ids = S.crew.filter((c) => per[c.id] || c.active !== false).map((c) => c.id);
+    let th = 0, tp = 0;
+    $("payBody").replaceChildren(...ids.map((id) => {
+      const hh = per[id] || 0, r = Number(S.rates[id]) || 0; th += hh; tp += hh * r;
+      return h("tr", {}, h("td", { text: crewName(id) }), h("td", { class: "n", text: fmt(hh) }), h("td", { class: "n", text: r ? money(r) : "set in Settings" }), h("td", { class: "n", text: money(hh * r) }));
+    }));
+    $("payFoot").replaceChildren(h("tr", {}, h("td", { text: "Total" }), h("td", { class: "n", text: fmt(th) }), h("td"), h("td", { class: "n", text: money(tp) })));
+    const bad = L.filter((s) => problem(s, S.month)).length;
+    $("payWarn").textContent = bad ? `${bad} shift${bad > 1 ? "s" : ""} this month still need a fix (red on the Hours screen). Fix them before paying.` : "";
+    const by = new Map();
+    for (const s of L) { const o = by.get(s.site) || { v: new Set(), h: 0 }; o.v.add(`${s.date}|${s.start}`); o.h += hoursOf(s); by.set(s.site, o); }
+    const rows = [...by].sort((a, b) => b[1].h - a[1].h);
+    $("clientBody").replaceChildren(...(rows.length ? rows.map(([k, o]) => h("tr", {}, h("td", { text: k || "No client" }), h("td", { class: "n", text: o.v.size }), h("td", { class: "n", text: fmt(o.h) })))
+      : [h("tr", {}, h("td", { colspan: 3, class: "empty", text: "No hours this month." }))]));
   }
 
-  // ---------- writes ----------
-  const writeError = (e) => e && e.code === "quota_exceeded" ? "Storage is full. Delete old shifts, then try again."
-    : e && e.code === "invalid_argument" ? "You don't have permission to change this. Ask Adam to share CleanScene Hours with you as a Contributor." : "Couldn't save. Check your connection and try again.";
-
-  async function patch(id, data, ok) {
-    const m = $("eMsg");
-    try { await S.db.doc("shifts/" + id).update({ ...data, updatedAt: new Date().toISOString() }); if (m) m.textContent = ok; S.delArm = false; }
-    catch (e) { if (m) m.textContent = writeError(e); }
+  // ---------- settings ----------
+  function renderSettings() {
+    if ($("pSet").contains(document.activeElement) && document.activeElement.id !== "sSearch") return;
+    $("crewList").replaceChildren(...S.crew.map((c) => {
+      const em = h("input", { value: (c.emails || []).join(", "), placeholder: "Calendar emails", "aria-label": `${c.name} calendar emails` });
+      const rate = S.owner ? h("input", { type: "number", step: "0.25", min: "0", value: S.rates[c.id] ?? "", placeholder: "$/h", "aria-label": `${c.name} pay rate`, style: "max-width:100px" }) : null;
+      const msg = h("span", { class: "small muted" });
+      const save = async () => {
+        try {
+          await S.db.doc("crew/" + c.id).update({ emails: em.value.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean) });
+          if (rate && String(S.rates[c.id] ?? "") !== rate.value) await S.db.doc("rates/" + c.id).set({ rate: Number(rate.value) || 0 });
+          msg.textContent = "Saved";
+        } catch (e) { msg.textContent = errText(e); }
+      };
+      em.addEventListener("change", save); if (rate) rate.addEventListener("change", save);
+      return h("div", { class: "item" }, h("b", { text: c.name }), em, h("div", { class: "row" }, rate, msg));
+    }));
+    const q = $("sSearch").value.trim().toLowerCase();
+    const all = S.sites.filter((x) => x.active !== false);
+    const list = all.filter((x) => !q || x.name.toLowerCase().includes(q) || (x.address || "").toLowerCase().includes(q)).sort((a, b) => a.name.localeCompare(b.name)).slice(0, q ? 50 : 10);
+    $("siteListEl").replaceChildren(...list.map((x) => {
+      const ad = h("input", { value: x.address || "", placeholder: "Address", "aria-label": `${x.name} address` });
+      ad.addEventListener("change", () => S.db.doc("sites/" + x.id).update({ address: ad.value.trim() }).catch(() => {}));
+      return h("div", { class: "item" }, h("span", { text: x.name }), ad, h("span"));
+    }), q ? null : h("div", { class: "small muted", text: `Showing 10 of ${all.length} clients. Search to find the rest.` }));
   }
-  async function del(id, btn) {
-    if (!S.delArm) { S.delArm = true; btn.textContent = "Tap again to delete"; return; }
-    try { await S.db.doc("shifts/" + id).delete(); S.editing = null; S.delArm = false; render(); }
-    catch (e) { $("eMsg").textContent = writeError(e); }
-  }
 
-  $("shiftForm").addEventListener("submit", async (e) => {
+  // ---------- add hours ----------
+  $("aClient").addEventListener("input", () => { const x = site($("aClient").value.trim()); $("aAddr").textContent = x && x.address ? x.address : ""; });
+  $("addForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const ids = [...$("fCrew").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
-    const msg = $("fMsg");
-    if (!ids.length) { msg.textContent = "Tap at least one crew member."; return; }
-    const base = { date: $("fDate").value, start: $("fStart").value, end: $("fEnd").value, breakMin: Number($("fBreak").value) || 0,
-      site: $("fSite").value.trim(), note: $("fNote").value.trim(), status: "confirmed", source: "manual", createdAt: new Date().toISOString() };
-    $("fSave").disabled = true; msg.textContent = "Saving...";
+    const who = [...$("aWho").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
+    const m = $("aMsg"), name = $("aClient").value.trim();
+    if (!site(name)) { m.className = "msg bad"; m.textContent = "Pick the client from the list. New clients go in Settings."; return; }
+    if (!who.length) { m.className = "msg bad"; m.textContent = "Tap who worked."; return; }
+    const base = { site: name, date: $("aDate").value, start: $("aStart").value, end: $("aEnd").value, breakMin: 0, note: "",
+      status: "confirmed", source: "manual", createdAt: new Date().toISOString() };
+    $("aSave").disabled = true;
     try {
-      for (const crew of ids) await S.db.collection("shifts").add({ ...base, crew });
-      msg.textContent = `Saved ${ids.length} shift${ids.length > 1 ? "s" : ""}.`;
-      $("fNote").value = "";
-      for (const b of $("fCrew").children) b.setAttribute?.("aria-pressed", "false");
-    } catch (err) { msg.textContent = writeError(err); }
-    $("fSave").disabled = false;
+      for (const crew of who) await S.db.collection("shifts").add({ ...base, crew });
+      m.className = "msg ok"; m.textContent = `Saved ${fmt(hoursOf(base))} h for ${who.map(crewName).join(", ")}.`;
+      $("aClient").value = ""; $("aAddr").textContent = ""; $("aStart").value = ""; $("aEnd").value = "";
+      for (const b of $("aWho").children) b.setAttribute("aria-pressed", "false");
+      const ws = mondayOf(parse(base.date));
+      if (ymd(ws) !== ymd(S.weekStart)) { S.weekStart = ws; subWeek(); }
+    } catch (err) { m.className = "msg bad"; m.textContent = errText(err); }
+    $("aSave").disabled = false;
   });
 
-  $("crewAdd").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try { const ref = await S.db.collection("crew").add({ name: $("caName").value.trim(), role: "Floater", emails: [], active: true });
-      if (S.isOwner && $("caRate").value) await S.db.doc("rates/" + ref.id).set({ rate: Number($("caRate").value) || 0 });
-      $("caName").value = ""; $("caRate").value = ""; } catch (err) { $("caName").setCustomValidity(writeError(err)); $("caName").reportValidity(); $("caName").setCustomValidity(""); }
-  });
-  $("siteAdd").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = $("saName").value.trim();
-    if (S.sites.some((s) => s.name.toLowerCase() === name.toLowerCase())) { $("saName").setCustomValidity("That client is already on the list."); $("saName").reportValidity(); $("saName").setCustomValidity(""); return; }
-    try { await S.db.collection("sites").add({ name, address: $("saAddr").value.trim(), type: $("saType").value, keywords: words($("saWords").value), active: true });
-      $("saName").value = ""; $("saWords").value = ""; $("saAddr").value = ""; } catch (err) { $("saName").setCustomValidity(writeError(err)); $("saName").reportValidity(); $("saName").setCustomValidity(""); }
-  });
+  $("sSearch").addEventListener("input", () => renderSettings());
+  $("crewAdd").addEventListener("submit", async (e) => { e.preventDefault();
+    try { await S.db.collection("crew").add({ name: $("cName").value.trim(), role: "Floater", emails: [], active: true, order: 50 }); $("cName").value = ""; }
+    catch (err) { $("sMsg").className = "msg bad"; $("sMsg").textContent = errText(err); } });
+  $("siteAdd").addEventListener("submit", async (e) => { e.preventDefault();
+    const name = $("sName").value.trim();
+    if (site(name)) { $("sMsg").className = "msg bad"; $("sMsg").textContent = "That client is already on the list."; return; }
+    try { await S.db.collection("sites").add({ name, address: $("sAddr").value.trim(), type: "", keywords: [], active: true });
+      $("sName").value = ""; $("sAddr").value = ""; $("sMsg").className = "msg ok"; $("sMsg").textContent = `Added ${name}.`; }
+    catch (err) { $("sMsg").className = "msg bad"; $("sMsg").textContent = errText(err); } });
 
-  // ---------- Google Calendar import ----------
+  // ---------- Google Calendar ----------
   function siteForEvent(ev) {
     const hay = `${ev.summary || ""} ${ev.location || ""}`.toLowerCase();
-    for (const s of S.sites) for (const k of s.keywords || []) if (k && hay.includes(k)) return s.name;
-    for (const s of S.sites) if (hay.includes(s.name.toLowerCase())) return s.name;
+    const act = S.sites.filter((x) => x.active !== false);
+    for (const x of act) for (const k of x.keywords || []) if (k && hay.includes(k)) return x.name;
+    for (const x of act) if (hay.includes(x.name.toLowerCase())) return x.name;
+    for (const x of act) { const a = (x.address || "").toLowerCase().split(/[,#(]/)[0].trim(); if (a.length > 6 && hay.includes(a)) return x.name; }
     return (ev.summary || "").trim();
   }
-  async function pullCalendar(mcp) {
-    const msg = $("cMsg"), from = $("cFrom").value, to = $("cTo").value;
-    if (!from || !to || to < from) { msg.textContent = "Pick a From date on or before the To date."; return; }
-    $("cPull").disabled = true; msg.textContent = "Reading the calendar...";
+  async function pull(mcp) {
+    const m = $("calMsg"), btn = $("calBtn");
+    const from = S.weekStart, today = addDays(mondayOf(new Date()), ((new Date().getDay() + 6) % 7) + 1);
+    const end = addDays(from, 7) < today ? addDays(from, 7) : today; // past days and today only
+    if (end <= from) { m.className = "msg"; m.textContent = "This week hasn't started yet."; return; }
+    btn.disabled = true; m.className = "msg"; m.textContent = "Reading the calendar...";
     try {
-      const end = new Date(to + "T00:00:00"); end.setDate(end.getDate() + 1);
-      const res = await mcp.callTool("Google Calendar", "list_events", { startTime: from + "T00:00:00", endTime: ymd(end) + "T00:00:00", orderBy: "startTime", pageSize: 250 });
-      const payload = res.payload || {};
-      const events = Array.isArray(payload.events) ? payload.events : [];
+      const res = await mcp.callTool("Google Calendar", "list_events", { startTime: ymd(from) + "T00:00:00", endTime: ymd(end) + "T00:00:00", orderBy: "startTime", pageSize: 250 });
+      const events = res.payload && Array.isArray(res.payload.events) ? res.payload.events : [];
       const byEmail = {};
       for (const c of S.crew) for (const em of c.emails || []) byEmail[em.toLowerCase()] = c.id;
-      let added = 0, skipped = 0, noCrew = 0;
+      let added = 0, had = 0;
       for (const ev of events) {
         const st = ev.start && ev.start.dateTime, en = ev.end && ev.end.dateTime;
         if (!st || !en) continue;
         const crewIds = [...new Set((ev.attendees || []).filter((a) => a.responseStatus !== "declined").map((a) => byEmail[(a.email || "").toLowerCase()]).filter(Boolean))];
-        if (!crewIds.length) { noCrew++; continue; }
         for (const crew of crewIds) {
-          const id = ("cal_" + ev.id + "_" + crew).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190);
-          const ref = S.db.doc("shifts/" + id);
-          const snap = await ref.get();
-          if (snap.exists) { skipped++; continue; }
+          const ref = S.db.doc("shifts/" + ("cal_" + ev.id + "_" + crew).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190));
+          if ((await ref.get()).exists) { had++; continue; }
           await ref.set({ date: st.slice(0, 10), start: st.slice(11, 16), end: en.slice(11, 16), breakMin: 0, crew, site: siteForEvent(ev),
             note: "", status: "scheduled", source: "calendar", calTitle: (ev.summary || "").slice(0, 140), createdAt: new Date().toISOString() });
           added++;
         }
       }
-      msg.textContent = `Added ${added} shift${added === 1 ? "" : "s"}. ${skipped} already logged.` + (noCrew ? ` ${noCrew} calendar event${noCrew === 1 ? "" : "s"} had no crew invited.` : "");
+      m.className = "msg ok";
+      m.textContent = added ? `Added ${added} shift${added > 1 ? "s" : ""} from the calendar. Tap anything in red to fix it.` : had ? "Everything on the calendar is already here." : "No crew jobs on the calendar for these days.";
     } catch (e) {
-      const code = e && e.code;
-      msg.textContent = code === "server_not_connected" ? "Connect Google Calendar in claude.ai Settings > Connectors, then try again."
-        : code === "needs_reauth" ? "Reconnect Google Calendar in claude.ai Settings > Connectors, then try again."
-        : code === "not_in_manifest" || code === "approval_required" ? "Calendar access was not allowed for this page. Allow it from the page's Permissions menu to pull shifts."
-        : code === "server_unavailable" ? "Google Calendar didn't answer. Try again in a minute."
-        : code === "tool_error" ? "Google Calendar refused the request: " + (e.message || "")
-        : e && e.code ? writeError(e) : "Couldn't pull from the calendar.";
+      m.className = "msg bad";
+      m.textContent = e && (e.code === "server_not_connected" || e.code === "needs_reauth") ? "Connect Google Calendar in claude.ai Settings > Connectors, then try again."
+        : e && (e.code === "not_in_manifest" || e.code === "approval_required") ? "Calendar access isn't allowed for this page yet. Allow it from the page's Permissions menu."
+        : e && e.code === "server_unavailable" ? "Google Calendar didn't answer. Try again in a minute." : "Couldn't read the calendar.";
     }
-    $("cPull").disabled = false;
+    btn.disabled = false;
   }
 
-  // ---------- wiring ----------
-  for (const t of document.querySelectorAll(".tab")) t.addEventListener("click", () => setView(t.dataset.view));
-  $("prevMonth").addEventListener("click", () => { const d = new Date(S.month.y, S.month.m - 1, 1); S.month = { y: d.getFullYear(), m: d.getMonth() }; subscribeShifts(); render(); });
-  $("nextMonth").addEventListener("click", () => { const d = new Date(S.month.y, S.month.m + 1, 1); S.month = { y: d.getFullYear(), m: d.getMonth() }; subscribeShifts(); render(); });
-  $("shiftFilters").addEventListener("click", (e) => { const f = e.target.closest("[data-f]"); if (f) { S.filter = f.dataset.f; render(); } });
-  $("crewFilter").addEventListener("change", (e) => { S.crewFilter = e.target.value; render(); });
-  $("siteSearch").addEventListener("input", () => renderSetup());
-  $("fSite").addEventListener("input", () => { const m = S.sites.find((x) => x.name === $("fSite").value.trim()); $("fAddr").textContent = m && m.address ? m.address : ""; });
-  $("fDate").value = today();
-  const yest = new Date(); yest.setDate(yest.getDate() - 1);
-  $("cFrom").value = ymd(yest); $("cTo").value = ymd(yest);
-
-  function subscribeShifts() {
-    if (!S.db) return;
-    if (S.unsubShifts) S.unsubShifts();
-    const [a, b] = monthRange();
-    S.shifts = [];
-    S.unsubShifts = S.db.collection("shifts").where("date", ">=", a).where("date", "<=", b).limit(1000)
-      .onSnapshot((snap) => { S.shifts = snap.docs.map((d) => ({ id: d.id, ...d.data() })); render(); },
-        (e) => { $("gate").hidden = false; $("gate").textContent = e.code === "revoked" ? "Access to this page changed. Reload to continue." : "Shifts stopped updating. Reload the page."; });
-  }
-
-  async function boot() {
+  // ---------- data ----------
+  function subWeek() {
+    if (S.unsubW) S.unsubW();
+    S.week = []; S.editing = null;
+    S.unsubW = S.db.collection("shifts").where("date", ">=", ymd(S.weekStart)).where("date", "<=", ymd(addDays(S.weekStart, 6))).limit(500)
+      .onSnapshot((q) => { S.week = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
     render();
+  }
+  function subMonth() {
+    if (!S.owner) return;
+    if (S.unsubM) S.unsubM();
+    const a = S.monthStart, b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
+    S.month = [];
+    S.unsubM = S.db.collection("shifts").where("date", ">=", ymd(a)).where("date", "<=", ymd(b)).limit(1000)
+      .onSnapshot((q) => { S.month = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
+  }
+
+  $("views").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (b) show(b.dataset.v); });
+  $("wPrev").addEventListener("click", () => { S.weekStart = addDays(S.weekStart, -7); subWeek(); });
+  $("wNext").addEventListener("click", () => { S.weekStart = addDays(S.weekStart, 7); subWeek(); });
+  $("mPrev").addEventListener("click", () => { S.monthStart = new Date(S.monthStart.getFullYear(), S.monthStart.getMonth() - 1, 1); subMonth(); render(); });
+  $("mNext").addEventListener("click", () => { S.monthStart = new Date(S.monthStart.getFullYear(), S.monthStart.getMonth() + 1, 1); subMonth(); render(); });
+  $("aDate").value = ymd(new Date());
+
+  (async function boot() {
     const claude = window.claude;
     const db = claude ? await claude.use("db") : null;
     const user = claude ? await claude.use("user") : null;
-    if (!db) { $("gate").textContent = "Open CleanScene Hours from claude.ai while signed in. It is private to Adam and Ali."; return; }
-    S.isOwner = user ? await user.isOwner() : false;
-    if (user && (await user.can("data.write")) === false) { $("gate").textContent = "CleanScene Hours is private to Adam and Ali. Ask Adam to share it with you as a Contributor."; return; }
-    S.db = db;
-    for (const el of document.querySelectorAll(".owner-only, #tab-pay")) el.hidden = !S.isOwner;
-    if (S.isOwner) db.collection("rates").onSnapshot((s) => { S.rates = Object.fromEntries(s.docs.map((d) => [d.id, Number(d.data().rate) || 0])); render(); }, () => {});
-    $("gate").hidden = true;
-    db.collection("crew").onSnapshot((s) => { S.crew = s.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name)); render(); }, () => {});
-    db.collection("sites").limit(1000).onSnapshot((s) => { S.sites = s.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
-    subscribeShifts();
-    setView(["log", "shifts", "setup"].concat(S.isOwner ? ["pay"] : []).includes(S.view) ? S.view : "log");
+    if (!db) { $("gate").textContent = "Open CleanScene Hours from claude.ai while signed in."; return; }
+    if (user && (await user.can("data.write")) === false) { $("gate").textContent = "This page is private. Ask Adam to share CleanScene Hours with you as a Contributor."; return; }
+    S.db = db; S.owner = user ? await user.isOwner() : false;
+    $("gate").hidden = true; $("views").hidden = false; $("vPay").hidden = !S.owner;
+    db.collection("crew").onSnapshot((q) => { S.crew = q.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name)); render(); }, () => {});
+    db.collection("sites").limit(1000).onSnapshot((q) => { S.sites = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
+    if (S.owner) db.collection("rates").onSnapshot((q) => { S.rates = Object.fromEntries(q.docs.map((d) => [d.id, Number(d.data().rate) || 0])); render(); }, () => {});
+    subWeek(); show("hours");
     const mcp = await claude.use("mcp");
-    if (mcp) { $("calPanel").hidden = false; $("cPull").addEventListener("click", () => pullCalendar(mcp)); }
-  }
-  boot();
+    if (mcp) { $("calBtn").hidden = false; $("calBtn").addEventListener("click", () => pull(mcp)); }
+  })();
 })();
 </script>

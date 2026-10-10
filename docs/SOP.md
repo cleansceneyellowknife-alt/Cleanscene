@@ -56,18 +56,16 @@ By **6 pm** Ali confirms tomorrow's work and posts changes in **#schedule**.
 4. Once a client is in Jobber scheduling: clock in/out on the visit in the Jobber app.
 
 ## 6. Hours (Ali: 2 minutes a day)
-Ali is shared as a **Contributor**: he sees clients (name and address), who worked, and hours. He never sees pay rates or the Pay tab; those are Adam's only. Open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
-1. **Log tab > Pull shifts from Google Calendar** (yesterday is pre-selected). Every job with crew invited becomes one shift per person at the scheduled times. Already-logged shifts are skipped, so pulling twice is safe.
-2. Work not on the calendar: **Log a shift** (tap everyone on the crew, one save).
-3. **Needs a look** lists only problems. Tap a shift to fix it:
-   - *Pick the client*: the calendar title had no client name. Choose the client.
-   - *Logged twice?*: same person, client and day twice. Delete one, or keep both if it really was two visits.
-   - *Check times* / *Over 12 h*: correct the start or end.
-   - Ran long or short: change End. Didn't happen: **Didn't happen** (drops it from pay).
-4. New crew member or client: **Crew & clients** tab. Add calendar emails to crew so invites match; add calendar words to clients (e.g. "day care") so calendar jobs land on the right client.
+Ali is shared as a **Contributor**: he sees clients (name and address), who worked, and hours. He never sees pay rates or pay. Open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
+
+One screen, one week at a time:
+1. **Bring in from calendar** adds this week's calendar jobs (one line per job, everyone who worked it). Pressing it twice never doubles anything.
+2. **Add hours** for anything not on the calendar: client, date, start, end, tap who worked, Save.
+3. Anything in **red** needs a fix. Tap it: pick the client, fix the times, or tap **Didn't happen**.
+4. New client or new crew member: **Settings**.
 
 ## 7. Payroll (monthly) and cross-check
-**1st of the month** (calendar reminder): open CleanScene Hours, go back one month, **Pay** tab.
+**1st of the month** (calendar reminder): open CleanScene Hours, **Pay**, go back one month (Adam only).
 1. "Needs a look" must be 0 for everyone.
 2. Pay from Hours and Gross.
 3. **Hours by client**: every client with hours must have an invoice in Jobber for that month.
