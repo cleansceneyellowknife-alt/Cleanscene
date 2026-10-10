@@ -14,7 +14,7 @@ Read this first. It is the source of truth for decisions already made.
 | CRM, quotes/contracts, schedule, timesheets, invoices, payments | Jobber | Single source of truth. "If it is not in Jobber, it did not happen." |
 | Internal team communication | Slack | One workspace, 8 fixed channels (see `slack/channels.json`). Client conversations stay in Jobber. |
 | Glue between apps | Zapier | Facebook Lead Ads -> Jobber request -> Slack #leads; quote approved -> #wins-and-issues. Specs in `zapier/zaps.md`. |
-| Hours log (phase 1) and cross-check (phase 2) | Google Sheet "CleanScene Hours Tracker" | Built by `hours-tracker/build_tracker.py`. Manager enters shifts via the Apps Script form in `hours-tracker/apps-script/`. |
+| Hours and monthly payroll | **CleanScene Hours** app: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Source `hours-app/index.html`. Private db (rules: read/write admin only). Collections `crew` (name, role, rate, emails, active), `sites` (name, type, keywords, active), `shifts` (date, crew, site, start, end, breakMin, status scheduled/confirmed/cancelled, source calendar/manual). Pulls Google Calendar `list_events` as the viewer. `hours-tracker/` is the spreadsheet backup. |
 | Documents | Google Drive | Signed master agreements, HSE/site documents. |
 
 Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), job posts in Google Calendar, checking Gmail to see who paid.
@@ -37,7 +37,7 @@ Status (2026-10-10):
 - Hours Tracker tab and column names are fixed: `Hours Log` (A Date, B Employee, C Client / Site, D Start, E End, F Break (min), G Hours, H Region, I Week of (Mon), J Jobber visit # / note, K Check, L hidden visit helper), `Staff`, `Sites`, `Pay Period`, `Weekly`, `Start Here`. Formulas are pre-filled in rows 2–2001 of `Hours Log`; new shifts go in the first row where column A is empty, never appended after row 2001.
 - Formulas must stay Google Sheets compatible: SUMIFS/COUNTIFS/INDEX/MATCH only; no XLOOKUP, FILTER, UNIQUE, spilling arrays.
 - Copy style: tight, ready to send. No emojis in emails.
-- Never store employee pay rates or client payment details anywhere except the Hours Tracker and Jobber.
+- Never store employee pay rates or client payment details anywhere except CleanScene Hours (and its spreadsheet backup) and Jobber.
 
 ## Open items / assumptions to confirm with Adam
 - Floater names in the tracker are placeholders (rates are real: Ali $28, floaters $25).

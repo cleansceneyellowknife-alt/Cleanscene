@@ -9,7 +9,7 @@ Version 2026-10-10. One section per part of the business. **If it is not in Jobb
 | Clients, requests, quotes, signed contracts, invoices, payments | **Jobber** | Adam | Live |
 | The schedule (who works where, when) | **Google Calendar invites today -> Jobber visits** | Ali | Moving: clients tagged `Move-to-Jobber-schedule` |
 | Team chat, schedule changes, open shifts, issues | **Slack** (8 channels, Open Shifts list, Team Playbook) | Ali | Live |
-| Crew hours and monthly pay | **Hours Tracker** (private: Adam + Ali), pre-filled from the calendar | Ali checks, Adam pays | Live |
+| Crew hours and monthly pay | **CleanScene Hours** app (private: Adam + Ali) https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw | Ali checks, Adam pays | Live |
 | Facebook leads -> Jobber -> #leads; quote won -> #wins-and-issues | **Zapier** | Adam | Specs ready (`zapier/zaps.md`) |
 | Weekly review, monthly payroll, billing checks | **Google Calendar** reminders on Adam's calendar | Adam | Live |
 | Signed agreements, HSE/site documents | **Google Drive** > CleanScene | Adam | |
@@ -56,21 +56,21 @@ By **6 pm** Ali confirms tomorrow's work and posts changes in **#schedule**.
 4. Once a client is in Jobber scheduling: clock in/out on the visit in the Jobber app.
 
 ## 6. Hours (Ali: 2 minutes a day)
-Private. Only Adam and Ali see hours and pay.
-1. Shifts are **pre-filled from the calendar invites** (`hours-tracker/import_calendar.py`): one row per person per job, scheduled times.
-2. Ali opens the Hours Log and only fixes exceptions: ran long or short (change End), cancelled (clear the row), extra work not on the calendar (add a row or use the Log a Shift form).
-3. Every row's **Check** must say OK:
-   - *Unknown site*: the calendar title had no client name. Replace with the client from the Sites tab.
-   - *Duplicate?*: same person, site and day twice. Delete one or confirm it was two visits.
-4. Once crew clock in on Jobber, Jobber timesheets replace the calendar as the source; the tracker cross-checks.
+Private. Only Adam and Ali (shared as Editor) can open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
+1. **Log tab > Pull shifts from Google Calendar** (yesterday is pre-selected). Every job with crew invited becomes one shift per person at the scheduled times. Already-logged shifts are skipped, so pulling twice is safe.
+2. Work not on the calendar: **Log a shift** (tap everyone on the crew, one save).
+3. **Needs a look** lists only problems. Tap a shift to fix it:
+   - *Pick the client*: the calendar title had no client name. Choose the client.
+   - *Logged twice?*: same person, client and day twice. Delete one, or keep both if it really was two visits.
+   - *Check times* / *Over 12 h*: correct the start or end.
+   - Ran long or short: change End. Didn't happen: **Didn't happen** (drops it from pay).
+4. New crew member or client: **Crew & clients** tab. Add calendar emails to crew so invites match; add calendar words to clients (e.g. "day care") so calendar jobs land on the right client.
 
 ## 7. Payroll (monthly) and cross-check
-**1st of the month** (calendar reminder):
-1. Hours Tracker > **Pay Period**, Months back = 1.
-2. Rows flagged = 0 for everyone.
-3. Pay from Hours and Gross pay. Rates live only on the Staff tab.
-
-**Every Monday** (calendar reminder): Weekly tab, Weeks back = 1; clear every flag.
+**1st of the month** (calendar reminder): open CleanScene Hours, go back one month, **Pay** tab.
+1. "Needs a look" must be 0 for everyone.
+2. Pay from Hours and Gross.
+3. **Hours by client**: every client with hours must have an invoice in Jobber for that month.
 
 ## 8. Invoicing and payments
 1. Residential: invoice from Jobber when the visit is done. Due on receipt.
@@ -94,7 +94,7 @@ Private. Only Adam and Ali see hours and pay.
 | 1st of month 9:00 | Adam | Payroll; commercial invoices |
 
 ## 11. Access and privacy
-- Hours, rates, pay: Hours Tracker only (Adam + Ali). Never in Slack public channels, email, or Jobber notes.
+- Hours, rates, pay: CleanScene Hours only (Adam + Ali). Never in Slack public channels, email, or Jobber notes.
 - Client payment details: Jobber only.
 - Slack #leads and #management: Adam + Ali only.
 - Door codes and alarm codes: in the job's calendar event / Jobber property notes only. Never in Slack.
@@ -103,4 +103,4 @@ Private. Only Adam and Ali see hours and pay.
 - Slack workspace and channel IDs: `slack/workspace.md`
 - Jobber settings checklist and message templates: `jobber/settings-checklist.md`
 - Zap specs: `zapier/zaps.md`
-- Hours Tracker and tools: `hours-tracker/`
+- CleanScene Hours app source: `hours-app/index.html` (live at https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw). Spreadsheet backup and importer: `hours-tracker/`
