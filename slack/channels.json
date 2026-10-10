@@ -1,0 +1,61 @@
+{
+  "_note": "The 8 fixed CleanScene channels. Client conversations stay in Jobber. Hours and pay never go in Slack except #management.",
+  "channels": [
+    {
+      "name": "announcements",
+      "private": false,
+      "topic": "Company news from Adam. Read only.",
+      "purpose": "Policy changes, holidays, training, wins worth sharing. Only Adam and the manager post here.",
+      "pinned": "How we use Slack: 1) Read #announcements. 2) Check #schedule before every shift. 3) Grab extra shifts in #open-shifts. 4) Problems on site go to #wins-and-issues right away, with a photo. 5) Clients never message you on Slack; anything a client says goes into Jobber."
+    },
+    {
+      "name": "schedule",
+      "private": false,
+      "topic": "Tomorrow's jobs and any changes. The Jobber app is the source of truth.",
+      "purpose": "Manager posts the next-day schedule by 6 pm and every same-day change.",
+      "pinned": "Your visits, addresses, access notes and checklists are in the Jobber app. This channel only announces changes. If Slack and Jobber disagree, Jobber wins; tell the manager."
+    },
+    {
+      "name": "open-shifts",
+      "private": false,
+      "topic": "Extra shifts up for grabs. Reply to claim.",
+      "purpose": "Manager posts uncovered visits. Staff claim them in the thread.",
+      "pinned": "How to claim: reply in the thread with 'I'll take it'. The shift is yours only when the manager reacts with a checkmark and assigns you in Jobber. Format for posts: Region / Date / Time / Site (no full address) / Est. hours / Type of clean."
+    },
+    {
+      "name": "leads",
+      "private": true,
+      "topic": "New leads from Facebook and Jobber requests (automatic).",
+      "purpose": "Zapier posts every new lead. Adam claims it with an eyes emoji and quotes within 24 hours.",
+      "pinned": "Every post here already exists as a Request in Jobber. Work it in Jobber, not here. React :eyes: when you start, :white_check_mark: when the quote is sent."
+    },
+    {
+      "name": "wins-and-issues",
+      "private": false,
+      "topic": "Quotes won, compliments, complaints, damage, lockouts, supply shortages.",
+      "purpose": "Anything that went especially well or wrong on a job. Photo + site + what happened.",
+      "pinned": "Issue format: Site / What happened / Photo / What you did. The manager logs a note on the client in Jobber. Damage or injury: call the manager first, then post."
+    },
+    {
+      "name": "yellowknife-team",
+      "private": false,
+      "topic": "Yellowknife crew: day-to-day chat, keys, vehicles, supplies.",
+      "purpose": "Everything local to the Yellowknife crew.",
+      "pinned": "Supplies running low? Post the item and site here by Thursday for Friday restock."
+    },
+    {
+      "name": "bc-team",
+      "private": false,
+      "topic": "Richmond/Vancouver crew: day-to-day chat, keys, vehicles, supplies.",
+      "purpose": "Everything local to the BC crew.",
+      "pinned": "Supplies running low? Post the item and site here by Thursday for Friday restock."
+    },
+    {
+      "name": "management",
+      "private": true,
+      "topic": "Adam + manager only. Hours, payroll, staffing, escalations.",
+      "purpose": "The only channel where hours or pay are discussed.",
+      "pinned": "Members: Adam and the manager only. Never paste pay rates or client payment details here; link to the Hours Tracker or Jobber instead."
+    }
+  ]
+}

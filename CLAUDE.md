@@ -25,7 +25,7 @@ Retire after rollout: the "2026 Cleans" monthly client tabs (keep as history), j
 - `zapier/zaps.md` — exact Zap specs (no-code; built in the Zapier UI).
 - `jobber/` — Jobber settings checklist and a draft of standard quote terms.
 
-Status (2026-10-10): this brief is the first commit. None of the files above exist in the repo yet.
+Status (2026-10-10): all files above exist. Next: migrate the original hours .xlsx into `Hours Log` once it is saved as a Google Sheet.
 
 ## Conventions
 - Hours Tracker tab and column names are fixed: `Hours Log` (A Date, B Employee, C Client / Site, D Start, E End, F Break (min), G Hours, H Region, I Week of (Mon), J Jobber visit # / note, K Check, L hidden visit helper), `Staff`, `Sites`, `Pay Period`, `Weekly`, `Start Here`. Formulas are pre-filled in rows 2–2001 of `Hours Log`; new shifts go in the first row where column A is empty, never appended after row 2001.

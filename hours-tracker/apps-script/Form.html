@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<style>
+  :root { --navy:#1F3A5F; --ok:#2E7D32; --bad:#B3261E; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,Segoe UI,Roboto,sans-serif; margin:0; padding:16px; background:#f6f7f9; color:#1b1b1b; }
+  h1 { font-size:20px; color:var(--navy); margin:0 0 12px; }
+  form, .card { background:#fff; border-radius:10px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.08); max-width:520px; }
+  label { display:block; font-weight:600; font-size:14px; margin:12px 0 4px; }
+  input, select, textarea { width:100%; font-size:16px; padding:10px; border:1px solid #c9ced6; border-radius:8px; }
+  select[multiple] { height:140px; }
+  .row { display:flex; gap:10px; } .row > div { flex:1; }
+  button { margin-top:16px; width:100%; padding:14px; font-size:17px; font-weight:600; border:0; border-radius:8px; background:var(--navy); color:#fff; }
+  button:disabled { opacity:.5; }
+  #msg { margin-top:12px; font-weight:600; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); }
+  .hint { font-size:12px; color:#666; margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; margin-top:8px; }
+  td { padding:6px 4px; border-bottom:1px solid #eee; vertical-align:top; }
+  .card { margin-top:16px; }
+</style>
+</head>
+<body>
+<h1>Log a Shift</h1>
+<form id="f">
+  <label for="date">Date</label>
+  <input type="date" id="date" required>
+
+  <label for="employees">Employee(s)</label>
+  <select id="employees" multiple required></select>
+  <div class="hint">Same site and times for a crew? Select everyone (Ctrl/Cmd-click on desktop, tap on phone).</div>
+
+  <label for="site">Client / Site</label>
+  <select id="site" required><option value="">Loading...</option></select>
+
+  <div class="row">
+    <div><label for="start">Start</label><input type="time" id="start" required></div>
+    <div><label for="end">End</label><input type="time" id="end" required></div>
+    <div><label for="brk">Break (min)</label><input type="number" id="brk" min="0" max="240" value="0"></div>
+  </div>
+
+  <label for="note">Jobber visit # / note (optional)</label>
+  <input type="text" id="note" maxlength="120">
+
+  <button id="btn" type="submit">Save shift</button>
+  <div id="msg"></div>
+</form>
+
+<div class="card">
+  <strong>Last 10 shifts</strong>
+  <table id="recent"></table>
+</div>
+
+<script>
+  var $ = function (id) { return document.getElementById(id); };
+  $('date').value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+  function fill(sel, items, placeholder) {
+    sel.innerHTML = placeholder ? '<option value="">' + placeholder + '</option>' : '';
+    items.forEach(function (v) { var o = document.createElement('option'); o.value = o.textContent = v; sel.appendChild(o); });
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function showRecent(rows) {
+    $('recent').innerHTML = rows.map(function (r) {
+      var cls = r.check === 'OK' ? 'ok' : 'bad';
+      return '<tr><td>' + esc(r.date) + '<br>' + esc(r.start) + '-' + esc(r.end) + '</td><td>' + esc(r.employee) +
+        '<br>' + esc(r.site) + '</td><td>' + esc(r.hours) + 'h</td><td class="' + cls + '">' + esc(r.check) + '</td></tr>';
+    }).join('') || '<tr><td>No shifts yet.</td></tr>';
+  }
+
+  google.script.run.withSuccessHandler(function (d) {
+    fill($('employees'), d.staff);
+    fill($('site'), d.sites, 'Pick a site');
+    showRecent(d.recent);
+  }).withFailureHandler(function (e) { $('msg').className = 'bad'; $('msg').textContent = e.message; }).getLists();
+
+  $('f').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var emps = Array.prototype.map.call($('employees').selectedOptions, function (o) { return o.value; });
+    if (!emps.length) { $('msg').className = 'bad'; $('msg').textContent = 'Pick at least one employee.'; return; }
+    $('btn').disabled = true; $('msg').className = ''; $('msg').textContent = 'Saving...';
+    google.script.run.withSuccessHandler(function (res) {
+      var bad = res.checks.filter(function (c) { return c !== 'OK'; });
+      $('msg').className = bad.length ? 'bad' : 'ok';
+      $('msg').textContent = bad.length
+        ? 'Saved, but check: ' + bad.join(', ') + ' (rows ' + res.rows.join(', ') + ')'
+        : 'Saved ' + res.rows.length + ' shift(s).';
+      showRecent(res.recent);
+      $('note').value = ''; $('btn').disabled = false;
+    }).withFailureHandler(function (e) {
+      $('msg').className = 'bad'; $('msg').textContent = e.message; $('btn').disabled = false;
+    }).submitShift({
+      date: $('date').value, employees: emps, site: $('site').value,
+      start: $('start').value, end: $('end').value, breakMin: $('brk').value, note: $('note').value
+    });
+  });
+</script>
+</body>
+</html>

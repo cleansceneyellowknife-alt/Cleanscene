@@ -1,0 +1,485 @@
+{
+  "_source": "Jobber clients invoiced 2026-08-12 to 2026-10-09, plus NACC. Pulled 2026-10-10. Type is a best guess from the client name; correct it on the Sites tab.",
+  "sites": [
+    {
+      "site": "507996 N.W.T. Ltd.",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "5950 N.W.T. LIMITED",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Aakash Bhandari",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Adriana Ewen",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Alex Zimmerman",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Allison Simpson",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Amber Liang",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Angelique Rossouw",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Ann Wind",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Arlene Hache",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Arlene Yaceyko",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Athena Wells",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Ben Fraser",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Beverly Speight",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Boston Pizza Yellowknife",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Bradley Dusome",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Brandon Kolb",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Callet Jeffrey",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Carol Pinto (Jamie Lavers)",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Cathie Harper",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Chris Van Drunen",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Chris Van Dyke",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "CT REIT - Mark's Yellowknife",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Custom Electric Ltd.",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Danielle Desmarais",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "David Jones",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Dechinta Centre for Research and Learning",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Dennis Althouse",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Dexterra Group Inc.",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Diavik Diamond Mine",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Diocese of The Arctic",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Gladys Eggenberger",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "GreenHaven Guest House",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Janet Pacey",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Janice McKenna",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Jeff Kincaid",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Kajsa Heyes",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Karen Brown",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Kat Marlowe",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Keith MacNeil",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Kelly Irwin",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Kevin Paul",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "La Taniere, CSFTNO",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Loretta Ransom",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Lynda Comerford",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Maneli Alipour",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Mary-Lynn Sputek",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Melissa Kruger",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Michael Liddiard",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Michael Targett",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Michel Legault",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Moses Hernandez",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "NACC",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Naka Power Utilities (NWT) Ltd.",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Nancy MacNeill",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Natasha Sanders",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Northview Residential (NHF LP)",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Orna Phelan",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "P and P Integrated",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Sandra Bradbury",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Sandra MacKenzie",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Shawn McCann",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Shawna Gills",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Simran Gosain",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Soham Srimani (Sayani Dirghangi)",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Sonia D'Angelo-Vibert",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Stanley Hotte",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Stefanie Pandke",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Steve Swan",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Stuart York",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Susan Eaton",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Susanne Matthews",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Sutherland's Drugs",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Tammy Connors",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "The Co-operators c/o Nathalie Gauthier Dore",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Thea Gillis Campbell",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Triton Enterprises Ltd.",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    },
+    {
+      "site": "Valerie Fournier",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "Yvonne Pokiak-Asher",
+      "region": "Yellowknife",
+      "type": "Residential",
+      "active": "Y"
+    },
+    {
+      "site": "École Allain St-Cyr, CSFTNO",
+      "region": "Yellowknife",
+      "type": "Commercial",
+      "active": "Y"
+    }
+  ]
+}
