@@ -3,10 +3,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: one phone-first column (max 620px). One screen: week header, Add hours, the week's shifts. Pay and Settings are separate views. */
+/* Layout: a month calendar (7-column grid) on top, the selected day's jobs below. Max 760px, one column on phones.
+   Each day cell answers Ali's three questions: how many jobs, how many hours, who worked. */
 :root {
-  --bg: #f2f5f4; --card: #ffffff; --sunk: #e7edeb; --ink: #14201c; --muted: #5e6d69; --line: #d5dedb;
-  --accent: #0f6b5c; --accent-ink: #ffffff; --accent-soft: #dbeee9;
+  --bg: #f2f5f4; --card: #ffffff; --sunk: #e8eeec; --ink: #14201c; --muted: #5e6d69; --line: #d6dfdc;
+  --accent: #0f6b5c; --accent-ink: #ffffff; --accent-soft: #dcefea; --heat: #0f6b5c;
   --bad: #b3261e; --bad-soft: #f8dedb; --ok: #2f7a3f;
   --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
@@ -14,17 +15,17 @@
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0f1514; --card: #182120; --sunk: #202b29; --ink: #e6eeeb; --muted: #98a9a4; --line: #2d3b39;
-  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark } }
+  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --heat: #54c4ae; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0f1514; --card: #182120; --sunk: #202b29; --ink: #e6eeeb; --muted: #98a9a4; --line: #2d3b39;
-  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark }
+  --accent: #54c4ae; --accent-ink: #062520; --accent-soft: #173a34; --heat: #54c4ae; --bad: #ff8a80; --bad-soft: #3f1c19; --ok: #7fd08e; color-scheme: dark }
 
 * { box-sizing: border-box }
 [hidden] { display: none !important }
 body { background: var(--bg); color: var(--ink); font: 16px/1.45 var(--body) }
-.wrap { max-width: 620px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 56px; display: grid; gap: 16px }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 56px; display: grid; gap: 16px }
 h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance }
-.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums }
 .muted { color: var(--muted) }
 .small { font-size: .85rem }
 .stack { display: grid; gap: 16px }
@@ -32,53 +33,77 @@ h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance }
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap }
 header h1 { font-size: 1.3rem; font-weight: 800 }
 header h1 span { color: var(--accent) }
-.views { display: flex; gap: 4px; background: var(--sunk); padding: 3px; border-radius: 10px }
-.views button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font: 600 .9rem var(--body); color: var(--muted); cursor: pointer }
-.views button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08) }
+.seg { display: flex; gap: 3px; background: var(--sunk); padding: 3px; border-radius: 10px }
+.seg button { border: 0; background: none; padding: 6px 12px; border-radius: 8px; font: 600 .9rem var(--body); color: var(--muted); cursor: pointer }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08) }
 
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: grid; gap: 14px }
-.period { display: flex; align-items: center; justify-content: space-between; gap: 8px }
-.period b { font-family: var(--display); font-size: 1.05rem }
-.total { font: 500 1.6rem var(--mono); font-variant-numeric: tabular-nums }
-.people { display: flex; flex-wrap: wrap; gap: 8px }
-.people span { background: var(--sunk); border-radius: 99px; padding: 3px 10px; font-size: .88rem }
-.people span b { font-family: var(--mono); font-weight: 500; margin-left: 6px }
+.monthbar { display: flex; align-items: center; justify-content: space-between; gap: 8px }
+.monthbar h2 { font-size: 1.35rem; font-weight: 800 }
+.btn { font: 600 .95rem var(--body); cursor: pointer; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 9px 13px }
+.btn.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn:disabled { opacity: .55; cursor: default }
+.link { border: 0; background: none; color: var(--accent); padding: 4px 0; font: 600 .95rem var(--body); text-decoration: underline; text-underline-offset: 3px; cursor: pointer }
+.danger { color: var(--bad) }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
 
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: 10px; overflow: hidden; border: 1px solid var(--line) }
+.people { display: flex; flex-wrap: wrap; gap: 8px }
+.people span { background: var(--sunk); border-radius: 99px; padding: 3px 11px; font-size: .88rem }
+.people b { font-family: var(--mono); font-weight: 500; margin-left: 6px }
+.stats div { background: var(--card); padding: 10px 12px; display: grid }
+.stats b { font: 500 1.35rem var(--mono); font-variant-numeric: tabular-nums }
+.stats span { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600 }
+
+/* Month grid */
+.dow, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px }
+.dow div { font: 600 .7rem var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); text-align: center; padding-bottom: 2px }
+.cell { position: relative; min-height: 84px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 6px; text-align: left; display: grid; align-content: start; gap: 2px; cursor: pointer; color: var(--ink); font: inherit; overflow: hidden }
+.cell.out { background: transparent; border-style: dashed; opacity: .5; cursor: default }
+.cell .d { font: 600 .82rem var(--body); color: var(--muted) }
+.cell.today .d { color: var(--accent-ink); background: var(--accent); border-radius: 99px; width: 1.6rem; height: 1.6rem; display: grid; place-items: center }
+.cell .jobs { font-size: .78rem; font-weight: 600 }
+.cell .hrs { font: 500 .95rem var(--mono); font-variant-numeric: tabular-nums }
+.cell .who { font-size: .72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.cell .fill { position: absolute; inset: auto 0 0 0; height: 4px; background: var(--heat) }
+.cell .dot { position: absolute; top: 7px; right: 7px; width: 8px; height: 8px; border-radius: 99px; background: var(--bad) }
+.cell[aria-pressed="true"] { border: 2px solid var(--accent); padding: 5px }
+@media (max-width: 560px) {
+  .grid, .dow { gap: 3px }
+  .cell { min-height: 62px; padding: 4px } .cell[aria-pressed="true"] { padding: 3px }
+  .cell .who, .cell .jobs { display: none } .cell .hrs { font-size: .8rem }
+}
+
+/* Day */
+.dayhead { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap }
+.dayhead h2 { font-size: 1.15rem }
+.summary { font-size: .95rem }
+.summary b { font-family: var(--mono); font-weight: 500 }
+.job { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); width: 100%; text-align: left; color: var(--ink); font: inherit; cursor: pointer }
+.job.flag { border-color: var(--bad); box-shadow: inset 4px 0 0 var(--bad) }
+.job .client { font-weight: 600; overflow-wrap: anywhere; min-width: 0 }
+.job .h { font: 500 1rem var(--mono); white-space: nowrap }
+.job .sub { grid-column: 1 / -1; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere }
+.job .warn { grid-column: 1 / -1; font-size: .85rem; color: var(--bad); font-weight: 600 }
+.empty { text-align: center; color: var(--muted); padding: 18px 8px }
+
+form.edit { display: grid; gap: 12px; padding: 14px; border: 2px solid var(--accent); border-radius: 12px; background: var(--card) }
 label { display: grid; gap: 5px; font-size: .8rem; font-weight: 600; color: var(--muted); letter-spacing: .02em }
-input { font: 400 1rem var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; width: 100%; min-width: 0 }
+input { font: 400 1rem var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; width: 100%; min-width: 0 }
 .three { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px }
 @media (max-width: 420px) { .three { grid-template-columns: 1fr 1fr } .three > :first-child { grid-column: 1 / -1 } }
 .chips { display: flex; flex-wrap: wrap; gap: 8px }
 .chip { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 99px; padding: 8px 14px; font: 600 .95rem var(--body); cursor: pointer }
 .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
-.addr { font-size: .85rem; color: var(--muted); margin-top: -6px }
-button { font: 600 .95rem var(--body); cursor: pointer; border-radius: 10px }
-.btn { border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 14px }
-.btn.go { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
-.primary { border: 0; background: var(--accent); color: var(--accent-ink); padding: 13px 16px; font-size: 1rem; width: 100% }
-.link { border: 0; background: none; color: var(--accent); padding: 4px 0; text-decoration: underline; text-underline-offset: 3px }
-.danger { color: var(--bad) }
-button:disabled { opacity: .55; cursor: default }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
-.msg { font-size: .9rem }
-.msg:empty { display: none }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
+.msg { font-size: .9rem } .msg:empty { display: none }
 .msg.ok { color: var(--ok) } .msg.bad { color: var(--bad) }
 
-.day { display: grid; gap: 8px }
-.day h3 { margin: 6px 2px 0; font: 600 .78rem var(--body); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); display: flex; justify-content: space-between }
-.shift { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; text-align: left; width: 100%; color: var(--ink); font: inherit; cursor: pointer }
-.shift.flag { border-color: var(--bad); box-shadow: inset 4px 0 0 var(--bad) }
-.shift .client { font-weight: 600; min-width: 0; overflow-wrap: anywhere }
-.shift .hrs { font: 500 1.05rem var(--mono); text-align: right; white-space: nowrap }
-.shift .sub { grid-column: 1 / -1; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere }
-.shift .warn { grid-column: 1 / -1; font-size: .85rem; color: var(--bad); font-weight: 600 }
-.edit { display: grid; gap: 12px; padding: 14px; border: 2px solid var(--accent); border-radius: 12px; background: var(--card) }
-.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center }
-.empty { text-align: center; color: var(--muted); padding: 20px 8px }
-
 table { width: 100%; border-collapse: collapse; font-size: .95rem }
-th { text-align: left; font: 600 .74rem var(--body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line) }
-td { padding: 10px 8px; border-bottom: 1px solid var(--line) }
+th { text-align: left; font: 600 .72rem var(--body); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap }
+td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top }
+tbody tr.click { cursor: pointer }
+tbody tr.click:hover td { background: var(--sunk) }
 .n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap }
 tfoot td { font-weight: 600; border: 0 }
 .tbl { overflow-x: auto }
@@ -90,62 +115,67 @@ tfoot td { font-weight: 600; border: 0 }
 <main class="wrap">
   <header>
     <h1>CleanScene <span>Hours</span></h1>
-    <nav class="views" id="views" hidden>
-      <button id="vHours" aria-pressed="true" data-v="hours">Hours</button>
-      <button id="vPay" aria-pressed="false" data-v="pay" hidden>Pay</button>
-      <button id="vSet" aria-pressed="false" data-v="settings">Settings</button>
+    <nav class="seg" id="views" hidden>
+      <button aria-pressed="true" data-v="month">Month</button>
+      <button aria-pressed="false" data-v="pay" id="vPay" hidden>Pay</button>
+      <button aria-pressed="false" data-v="settings">Settings</button>
     </nav>
   </header>
 
   <p id="gate" class="card muted" style="margin:0">Loading. This page is private to CleanScene management.</p>
 
-  <!-- HOURS -->
-  <div id="pHours" class="stack" hidden>
-    <section class="card" aria-label="Week summary">
-      <div class="period">
-        <button class="btn" id="wPrev" aria-label="Previous week">&#8249;</button>
-        <div style="text-align:center"><b id="wLabel">This week</b><div class="small muted" id="wSub"></div></div>
-        <button class="btn" id="wNext" aria-label="Next week">&#8250;</button>
+  <!-- MONTH -->
+  <div id="pMonth" class="stack" hidden>
+    <section class="card">
+      <div class="monthbar">
+        <button class="btn" id="mPrev" aria-label="Previous month">&#8249;</button>
+        <h2 id="mLabel">Month</h2>
+        <button class="btn" id="mNext" aria-label="Next month">&#8250;</button>
       </div>
-      <div style="display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap">
-        <div><div class="small muted">Total hours</div><div class="total" id="wTotal">0.00</div></div>
+      <div class="stats" id="mStats"></div>
+      <div class="people" id="mPeople"></div>
+      <div class="row" style="justify-content:space-between">
+        <div class="seg" id="mode">
+          <button aria-pressed="true" data-m="cal">Calendar</button>
+          <button aria-pressed="false" data-m="list">List</button>
+        </div>
         <button class="btn" id="calBtn" hidden>Bring in from calendar</button>
       </div>
-      <div class="people" id="wPeople"></div>
       <div class="msg" id="calMsg" role="status"></div>
+      <div id="calView">
+        <div class="dow"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+        <div class="grid" id="grid" style="margin-top:4px"></div>
+      </div>
+      <div id="listView" class="tbl" hidden>
+        <table>
+          <thead><tr><th>Date</th><th class="n">Jobs</th><th class="n">Hours</th><th>Who worked</th></tr></thead>
+          <tbody id="listBody"></tbody><tfoot id="listFoot"></tfoot>
+        </table>
+      </div>
     </section>
 
-    <form class="card" id="addForm" autocomplete="off">
-      <h2 style="font-size:1.1rem">Add hours</h2>
-      <label>Client<input id="aClient" list="clientList" required placeholder="Type a client name"></label>
-      <div class="addr" id="aAddr"></div>
-      <datalist id="clientList"></datalist>
-      <div class="three">
-        <label>Date<input type="date" id="aDate" required></label>
-        <label>Start<input type="time" id="aStart" required></label>
-        <label>End<input type="time" id="aEnd" required></label>
+    <section class="card" id="dayCard" aria-live="polite">
+      <div class="dayhead">
+        <div>
+          <h2 id="dTitle">Day</h2>
+          <div class="summary muted" id="dSummary"></div>
+        </div>
+        <button class="btn go" id="addBtn">Add a job</button>
       </div>
-      <div style="display:grid;gap:6px">
-        <span class="small muted" style="font-weight:600">Who worked</span>
-        <div class="chips" id="aWho"></div>
-      </div>
-      <button class="primary" id="aSave" type="submit">Save</button>
-      <div class="msg" id="aMsg" role="status"></div>
-    </form>
-
-    <section id="dayList" class="stack" style="gap:12px" aria-label="Shifts this week"></section>
+      <div id="dJobs" style="display:grid;gap:8px"></div>
+    </section>
   </div>
 
   <!-- PAY (owner only) -->
   <div id="pPay" class="stack" hidden>
     <section class="card">
-      <div class="period">
-        <button class="btn" id="mPrev" aria-label="Previous month">&#8249;</button>
-        <b id="mLabel">Month</b>
-        <button class="btn" id="mNext" aria-label="Next month">&#8250;</button>
+      <div class="monthbar">
+        <button class="btn" id="pPrev" aria-label="Previous month">&#8249;</button>
+        <h2 id="pLabel">Month</h2>
+        <button class="btn" id="pNext" aria-label="Next month">&#8250;</button>
       </div>
       <div class="tbl"><table>
-        <thead><tr><th>Person</th><th class="n">Hours</th><th class="n">Rate</th><th class="n">Pay</th></tr></thead>
+        <thead><tr><th>Person</th><th class="n">Days</th><th class="n">Hours</th><th class="n">Rate</th><th class="n">Pay</th></tr></thead>
         <tbody id="payBody"></tbody><tfoot id="payFoot"></tfoot>
       </table></div>
       <div class="msg bad" id="payWarn"></div>
@@ -180,6 +210,8 @@ tfoot td { font-weight: 600; border: 0 }
       <div class="msg" id="sMsg" role="status"></div>
     </section>
   </div>
+
+  <datalist id="clientList"></datalist>
 </main>
 
 <script>
@@ -200,100 +232,187 @@ tfoot td { font-weight: 600; border: 0 }
   const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const parse = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-  const mondayOf = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return addDays(x, -((x.getDay() + 6) % 7)); };
-  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const dayName = (s) => parse(s).toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" });
+  const longDay = (s) => parse(s).toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric" });
+  const shortDay = (s) => parse(s).toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" });
   const t12 = (t) => { if (!t) return "--"; let [a, b] = t.split(":").map(Number); const p = a >= 12 ? "pm" : "am"; a = a % 12 || 12; return b ? `${a}:${pad(b)}${p}` : `${a}${p}`; };
   const toMin = (t) => { if (!t) return null; const [a, b] = t.split(":").map(Number); return a * 60 + b; };
   const hoursOf = (s) => { const a = toMin(s.start), b = toMin(s.end); if (a == null || b == null) return 0; return Math.round((((b - a + 1440) % 1440) - (Number(s.breakMin) || 0)) / 60 * 100) / 100; };
   const fmt = (n) => (Math.round(n * 100) / 100).toFixed(2);
+  const fmtShort = (n) => { const r = Math.round(n * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(r * 10 % 1 ? 2 : 1); };
   const money = (n) => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const errText = (e) => e && e.code === "invalid_argument" ? "You don't have permission to change this." : e && e.code === "quota_exceeded" ? "Storage is full." : "Couldn't save. Check your connection and try again.";
+  const today = () => ymd(new Date());
 
-  const S = { db: null, owner: false, view: "hours", crew: [], sites: [], rates: {}, week: [], month: [], editing: null, confirmDel: false,
-    weekStart: mondayOf(new Date()), monthStart: (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })(), unsubW: null, unsubM: null };
+  const now = new Date();
+  const S = { db: null, owner: false, view: "month", mode: "cal", crew: [], sites: [], rates: {}, shifts: [],
+    month: new Date(now.getFullYear(), now.getMonth(), 1), day: today(), editing: null, adding: false, confirmDel: false, unsub: null };
   const crewName = (id) => (S.crew.find((c) => c.id === id) || {}).name || "Unknown";
+  const firstName = (id) => crewName(id).split(" ")[0];
   const site = (name) => S.sites.find((x) => x.name === name);
   const live = (list) => list.filter((s) => s.status !== "cancelled");
 
-  function problem(s, list) {
+  function problem(s) {
     if (!s.site || !s.start || !s.end || !s.crew) return "Missing details";
     if (!site(s.site)) return "Tap to pick the client from the list";
     const hh = hoursOf(s);
     if (hh <= 0) return "Check the times";
     if (hh > 12) return "Over 12 hours: check the times";
-    if (list.filter((x) => x.status !== "cancelled" && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
+    if (S.shifts.filter((x) => x.status !== "cancelled" && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
     return "";
   }
-
-  // ---------- views ----------
-  function show(v) {
-    if (v === "pay" && !S.owner) v = "hours";
-    S.view = v;
-    for (const b of $("views").children) b.setAttribute("aria-pressed", String(b.dataset.v === v));
-    $("pHours").hidden = v !== "hours"; $("pPay").hidden = v !== "pay"; $("pSet").hidden = v !== "settings";
-    if (v === "pay") subMonth();
-    render();
-  }
-  function render() {
-    if (!S.db) return;
-    if (S.view === "hours") renderHours();
-    if (S.view === "pay") renderPay();
-    if (S.view === "settings") renderSettings();
-  }
-
-  function renderHours() {
-    const ws = S.weekStart, we = addDays(ws, 6);
-    $("wLabel").textContent = ymd(ws) === ymd(mondayOf(new Date())) ? "This week" : `Week of ${MON[ws.getMonth()]} ${ws.getDate()}`;
-    $("wSub").textContent = `${MON[ws.getMonth()]} ${ws.getDate()} – ${MON[we.getMonth()]} ${we.getDate()}`;
-    const L = live(S.week);
-    $("wTotal").textContent = fmt(L.reduce((a, s) => a + hoursOf(s), 0));
-    const per = {};
-    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
-    $("wPeople").replaceChildren(...Object.entries(per).sort((a, b) => b[1] - a[1]).map(([id, v]) => h("span", {}, crewName(id), h("b", { text: fmt(v) }))));
-
-    const picked = new Set([...$("aWho").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id));
-    $("aWho").replaceChildren(...S.crew.filter((c) => c.active !== false).map((c) => h("button", { type: "button", class: "chip", "data-id": c.id,
-      "aria-pressed": String(picked.has(c.id)), onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
-    $("clientList").replaceChildren(...S.sites.filter((x) => x.active !== false).sort((a, b) => a.name.localeCompare(b.name)).map((x) => h("option", { value: x.name, label: x.address || "" })));
-
-    if (S.editing && $("dayList").querySelector(".edit") && $("dayList").contains(document.activeElement)) return; // keep an open edit as typed
-    const days = new Map();
-    for (const s of [...S.week].sort((a, b) => b.date.localeCompare(a.date) || (a.start || "").localeCompare(b.start || ""))) {
-      if (!days.has(s.date)) days.set(s.date, []); days.get(s.date).push(s);
-    }
-    if (!days.size) { $("dayList").replaceChildren(h("div", { class: "empty" }, "No hours this week yet. Add them above, or tap Bring in from calendar.")); return; }
-    $("dayList").replaceChildren(...[...days].map(([d, list]) => h("div", { class: "day" },
-      h("h3", {}, h("span", { text: dayName(d) }), h("span", { class: "num", text: fmt(live(list).reduce((a, s) => a + hoursOf(s), 0)) + " h" })),
-      ...groupVisits(list).map((g) => S.editing === g.key ? editor(g) : visitCard(g)))));
-  }
-
-  // One card per visit (same client, date and times), listing everyone who worked it.
-  function groupVisits(list) {
+  // A job = one client visit on one day at one time; it can have several people.
+  function jobsOf(list) {
     const m = new Map();
     for (const s of list) {
       const k = `${s.date}|${s.site}|${s.start}|${s.end}|${s.status === "cancelled" ? "x" : ""}`;
       if (!m.has(k)) m.set(k, { key: k, items: [] });
       m.get(k).items.push(s);
     }
-    return [...m.values()];
+    return [...m.values()].sort((a, b) => (a.items[0].start || "").localeCompare(b.items[0].start || ""));
+  }
+  function dayStats(date) {
+    const all = S.shifts.filter((s) => s.date === date);
+    const L = live(all);
+    const jobs = jobsOf(L).length;
+    const hours = L.reduce((a, s) => a + hoursOf(s), 0);
+    const who = [...new Set(L.map((s) => s.crew))];
+    const flag = L.some((s) => problem(s));
+    return { all, jobs, hours, who, flag };
   }
 
-  function visitCard(g) {
+  // ---------- views ----------
+  function show(v) {
+    if (v === "pay" && !S.owner) v = "month";
+    S.view = v;
+    for (const b of $("views").children) b.setAttribute("aria-pressed", String(b.dataset.v === v));
+    $("pMonth").hidden = v !== "month"; $("pPay").hidden = v !== "pay"; $("pSet").hidden = v !== "settings";
+    render();
+  }
+  function render() {
+    if (!S.db) return;
+    $("clientList").replaceChildren(...S.sites.filter((x) => x.active !== false).sort((a, b) => a.name.localeCompare(b.name)).map((x) => h("option", { value: x.name, label: x.address || "" })));
+    if (S.view === "month") { renderMonth(); renderDay(); }
+    if (S.view === "pay") renderPay();
+    if (S.view === "settings") renderSettings();
+  }
+
+  function renderMonth() {
+    const m = S.month, label = `${MONTHS[m.getMonth()]} ${m.getFullYear()}`;
+    $("mLabel").textContent = label;
+    const L = live(S.shifts);
+    const per = {};
+    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
+    const days = new Set(L.map((s) => s.date)).size;
+    const stats = [[String(jobsOf(L).length), "Jobs"], [fmt(L.reduce((a, s) => a + hoursOf(s), 0)), "Hours"], [String(days), "Days worked"]];
+    $("mStats").replaceChildren(...stats.map(([v, l]) => h("div", {}, h("b", { text: v }), h("span", { text: l }))));
+    $("mPeople").replaceChildren(...Object.entries(per).sort((a, b) => b[1] - a[1]).map(([id, v]) => h("span", {}, crewName(id), h("b", { text: fmt(v) + " h" }))));
+    for (const b of $("mode").children) b.setAttribute("aria-pressed", String(b.dataset.m === S.mode));
+    $("calView").hidden = S.mode !== "cal"; $("listView").hidden = S.mode !== "list";
+
+    // calendar grid
+    const first = new Date(m.getFullYear(), m.getMonth(), 1), last = new Date(m.getFullYear(), m.getMonth() + 1, 0);
+    const lead = (first.getDay() + 6) % 7;
+    const maxH = Math.max(1, ...Array.from({ length: last.getDate() }, (_, i) => dayStats(ymd(new Date(m.getFullYear(), m.getMonth(), i + 1))).hours));
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push(h("div", { class: "cell out", "aria-hidden": "true" }));
+    for (let d = 1; d <= last.getDate(); d++) {
+      const date = ymd(new Date(m.getFullYear(), m.getMonth(), d)), st = dayStats(date);
+      cells.push(h("button", { type: "button", class: "cell" + (date === today() ? " today" : ""), "aria-pressed": String(date === S.day),
+          "aria-label": `${longDay(date)}: ${st.jobs} jobs, ${fmt(st.hours)} hours`, onclick: () => { S.day = date; S.editing = null; S.adding = false; render(); $("dayCard").scrollIntoView({ behavior: "smooth", block: "start" }); } },
+        h("span", { class: "d", text: d }),
+        st.jobs ? h("span", { class: "jobs", text: `${st.jobs} job${st.jobs > 1 ? "s" : ""}` }) : null,
+        st.jobs ? h("span", { class: "hrs", text: `${fmtShort(st.hours)}h` }) : null,
+        st.jobs ? h("span", { class: "who", text: st.who.map(firstName).join(", ") }) : null,
+        st.jobs ? h("span", { class: "fill", style: `opacity:${(0.25 + 0.75 * st.hours / maxH).toFixed(2)}` }) : null,
+        st.flag ? h("span", { class: "dot", title: "Needs a fix" }) : null));
+    }
+    while (cells.length % 7) cells.push(h("div", { class: "cell out", "aria-hidden": "true" }));
+    $("grid").replaceChildren(...cells);
+
+    // list (like Ali's sheet: one row per day)
+    const rows = [];
+    let tj = 0, th = 0;
+    for (let d = 1; d <= last.getDate(); d++) {
+      const date = ymd(new Date(m.getFullYear(), m.getMonth(), d)), st = dayStats(date);
+      if (!st.jobs) continue;
+      tj += st.jobs; th += st.hours;
+      rows.push(h("tr", { class: "click", onclick: () => { S.day = date; S.editing = null; render(); $("dayCard").scrollIntoView({ behavior: "smooth", block: "start" }); } },
+        h("td", {}, shortDay(date), st.flag ? h("span", { class: "danger small", text: " • fix" }) : null),
+        h("td", { class: "n", text: st.jobs }), h("td", { class: "n", text: fmt(st.hours) }), h("td", { text: st.who.map(crewName).join(", ") })));
+    }
+    $("listBody").replaceChildren(...(rows.length ? rows : [h("tr", {}, h("td", { colspan: 4, class: "empty", text: "No jobs logged this month yet." }))]));
+    $("listFoot").replaceChildren(h("tr", {}, h("td", { text: "Month total" }), h("td", { class: "n", text: tj }), h("td", { class: "n", text: fmt(th) }), h("td")));
+  }
+
+  function renderDay() {
+    const inMonth = S.day.slice(0, 7) === ymd(S.month).slice(0, 7);
+    if (!inMonth) S.day = ymd(S.month);
+    const st = dayStats(S.day);
+    $("dTitle").textContent = longDay(S.day);
+    $("dSummary").replaceChildren(...(st.jobs ? [h("b", { text: st.jobs }), ` job${st.jobs > 1 ? "s" : ""} · `, h("b", { text: fmt(st.hours) }), " hours · ", st.who.map(crewName).join(", ")] : ["Nothing logged for this day."]));
+    if ($("dJobs").contains(document.activeElement) && document.activeElement.tagName === "INPUT") return; // don't wipe a form being typed in
+    const parts = [];
+    if (S.adding) parts.push(addForm());
+    for (const g of jobsOf(st.all)) parts.push(S.editing === g.key ? editForm(g) : jobCard(g));
+    if (!parts.length) parts.push(h("div", { class: "empty", text: "No jobs. Tap Add a job, or Bring in from calendar." }));
+    $("dJobs").replaceChildren(...parts);
+  }
+
+  function jobCard(g) {
     const s = g.items[0], cancelled = s.status === "cancelled";
-    const warn = cancelled ? "" : g.items.map((x) => problem(x, S.week)).find(Boolean) || "";
+    const warn = cancelled ? "" : g.items.map(problem).find(Boolean) || "";
     const addr = (site(s.site) || {}).address;
-    return h("button", { type: "button", class: "shift" + (warn ? " flag" : ""), style: cancelled ? "opacity:.55" : null,
-        onclick: () => { S.editing = g.key; S.confirmDel = false; render(); } },
+    return h("button", { type: "button", class: "job" + (warn ? " flag" : ""), style: cancelled ? "opacity:.55" : null, onclick: () => { S.editing = g.key; S.adding = false; S.confirmDel = false; render(); } },
       h("div", { class: "client", text: (s.site || "No client") + (cancelled ? " (didn't happen)" : "") }),
-      h("div", { class: "hrs", text: g.items.length > 1 ? `${fmt(hoursOf(s))} h × ${g.items.length}` : `${fmt(hoursOf(s))} h` }),
-      h("div", { class: "sub", text: [addr, `${t12(s.start)}–${t12(s.end)}`, g.items.map((x) => crewName(x.crew)).join(", ")].filter(Boolean).join(" · ") }),
+      h("div", { class: "h", text: g.items.length > 1 ? `${fmt(hoursOf(s))} h × ${g.items.length}` : `${fmt(hoursOf(s))} h` }),
+      h("div", { class: "sub", text: [`${t12(s.start)}–${t12(s.end)}`, g.items.map((x) => crewName(x.crew)).join(", "), addr].filter(Boolean).join(" · ") }),
       warn ? h("div", { class: "warn", text: warn }) : null);
   }
 
-  function editor(g) {
+  function crewChips(selected) {
+    return h("div", { class: "chips" }, ...S.crew.filter((c) => c.active !== false).map((c) => h("button", { type: "button", class: "chip", "data-id": c.id,
+      "aria-pressed": String(selected.has(c.id)), onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
+  }
+
+  function addForm() {
+    const addr = h("div", { class: "small muted" });
+    const client = h("input", { id: "nClient", list: "clientList", placeholder: "Type a client name", required: true });
+    client.addEventListener("input", () => { const x = site(client.value.trim()); addr.textContent = x && x.address ? x.address : ""; });
+    const chips = crewChips(new Set());
+    const msg = h("div", { class: "msg", role: "status" });
+    const f = h("form", { class: "edit", autocomplete: "off" },
+      h("h2", { style: "font-size:1rem", text: "Add a job" }),
+      h("label", {}, "Client", client), addr,
+      h("div", { class: "three" },
+        h("label", {}, "Date", h("input", { id: "nDate", type: "date", value: S.day, required: true })),
+        h("label", {}, "Start", h("input", { id: "nStart", type: "time", required: true })),
+        h("label", {}, "End", h("input", { id: "nEnd", type: "time", required: true }))),
+      h("div", { style: "display:grid;gap:6px" }, h("span", { class: "small muted", style: "font-weight:600", text: "Who worked" }), chips),
+      h("div", { class: "row" }, h("button", { class: "btn go", type: "submit" }, "Save job"), h("button", { class: "btn", type: "button", onclick: () => { S.adding = false; render(); } }, "Cancel")),
+      msg);
+    f.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const who = [...chips.querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
+      const name = client.value.trim();
+      if (!site(name)) { msg.className = "msg bad"; msg.textContent = "Pick the client from the list. New clients go in Settings."; return; }
+      if (!who.length) { msg.className = "msg bad"; msg.textContent = "Tap who worked."; return; }
+      const base = { site: name, date: $("nDate").value, start: $("nStart").value, end: $("nEnd").value, breakMin: 0, note: "", status: "confirmed", source: "manual", createdAt: new Date().toISOString() };
+      try {
+        for (const crew of who) await S.db.collection("shifts").add({ ...base, crew });
+        S.adding = false; S.day = base.date;
+        const d = parse(base.date);
+        if (d.getMonth() !== S.month.getMonth() || d.getFullYear() !== S.month.getFullYear()) { S.month = new Date(d.getFullYear(), d.getMonth(), 1); subscribe(); }
+        render();
+      } catch (err) { msg.className = "msg bad"; msg.textContent = errText(err); }
+    });
+    setTimeout(() => client.focus(), 0);
+    return f;
+  }
+
+  function editForm(g) {
     const s = g.items[0];
+    const msg = h("div", { class: "msg", role: "status" });
     const f = h("form", { class: "edit" },
       h("label", {}, "Client", h("input", { id: "eClient", list: "clientList", value: site(s.site) ? s.site : "", placeholder: s.calTitle ? `Calendar said: ${s.calTitle}` : "Type a client name" })),
       h("div", { class: "three" },
@@ -305,44 +424,42 @@ tfoot td { font-weight: 600; border: 0 }
         h("button", { class: "btn go", type: "submit" }, "Save"),
         h("button", { class: "btn", type: "button", onclick: () => { S.editing = null; render(); } }, "Close"),
         s.status === "cancelled"
-          ? h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "confirmed" }) }, "It did happen")
-          : h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "cancelled" }) }, "Didn't happen"),
-        h("button", { class: "link danger", type: "button", onclick: (e) => removeAll(g, e.currentTarget) }, "Delete")),
-      h("div", { class: "msg", id: "eMsg", role: "status" }));
+          ? h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "confirmed" }, msg) }, "It did happen")
+          : h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "cancelled" }, msg) }, "Didn't happen"),
+        h("button", { class: "link danger", type: "button", onclick: (e) => removeAll(g, e.currentTarget, msg) }, "Delete")),
+      msg);
     f.addEventListener("submit", (e) => {
       e.preventDefault();
       const name = $("eClient").value.trim();
-      if (!site(name)) { $("eMsg").className = "msg bad"; $("eMsg").textContent = "Pick the client from the list."; return; }
-      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" });
+      if (!site(name)) { msg.className = "msg bad"; msg.textContent = "Pick the client from the list."; return; }
+      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" }, msg);
     });
     return f;
   }
-
-  async function saveAll(g, data) {
-    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: new Date().toISOString() }); S.editing = null; render(); }
-    catch (e) { const m = $("eMsg"); if (m) { m.className = "msg bad"; m.textContent = errText(e); } }
+  async function saveAll(g, data, msg) {
+    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: new Date().toISOString() }); S.editing = null; document.activeElement?.blur(); render(); }
+    catch (e) { msg.className = "msg bad"; msg.textContent = errText(e); }
   }
-  async function removeAll(g, btn) {
+  async function removeAll(g, btn, msg) {
     if (!S.confirmDel) { S.confirmDel = true; btn.textContent = "Tap again to delete"; return; }
     try { for (const s of g.items) await S.db.doc("shifts/" + s.id).delete(); S.editing = null; S.confirmDel = false; render(); }
-    catch (e) { $("eMsg").className = "msg bad"; $("eMsg").textContent = errText(e); }
+    catch (e) { msg.className = "msg bad"; msg.textContent = errText(e); }
   }
 
   // ---------- pay (owner only) ----------
   function renderPay() {
-    const ms = S.monthStart;
-    $("mLabel").textContent = `${MONTHS[ms.getMonth()]} ${ms.getFullYear()}`;
-    const L = live(S.month), per = {};
-    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
-    const ids = S.crew.filter((c) => per[c.id] || c.active !== false).map((c) => c.id);
+    $("pLabel").textContent = `${MONTHS[S.month.getMonth()]} ${S.month.getFullYear()}`;
+    const L = live(S.shifts), per = {}, days = {};
+    for (const s of L) { per[s.crew] = (per[s.crew] || 0) + hoursOf(s); (days[s.crew] = days[s.crew] || new Set()).add(s.date); }
     let th = 0, tp = 0;
-    $("payBody").replaceChildren(...ids.map((id) => {
-      const hh = per[id] || 0, r = Number(S.rates[id]) || 0; th += hh; tp += hh * r;
-      return h("tr", {}, h("td", { text: crewName(id) }), h("td", { class: "n", text: fmt(hh) }), h("td", { class: "n", text: r ? money(r) : "set in Settings" }), h("td", { class: "n", text: money(hh * r) }));
+    $("payBody").replaceChildren(...S.crew.filter((c) => per[c.id] || c.active !== false).map((c) => {
+      const hh = per[c.id] || 0, r = Number(S.rates[c.id]) || 0; th += hh; tp += hh * r;
+      return h("tr", {}, h("td", { text: c.name }), h("td", { class: "n", text: days[c.id] ? days[c.id].size : 0 }), h("td", { class: "n", text: fmt(hh) }),
+        h("td", { class: "n", text: r ? money(r) : "set in Settings" }), h("td", { class: "n", text: money(hh * r) }));
     }));
-    $("payFoot").replaceChildren(h("tr", {}, h("td", { text: "Total" }), h("td", { class: "n", text: fmt(th) }), h("td"), h("td", { class: "n", text: money(tp) })));
-    const bad = L.filter((s) => problem(s, S.month)).length;
-    $("payWarn").textContent = bad ? `${bad} shift${bad > 1 ? "s" : ""} this month still need a fix (red on the Hours screen). Fix them before paying.` : "";
+    $("payFoot").replaceChildren(h("tr", {}, h("td", { text: "Total" }), h("td"), h("td", { class: "n", text: fmt(th) }), h("td"), h("td", { class: "n", text: money(tp) })));
+    const bad = L.filter((s) => problem(s)).length;
+    $("payWarn").textContent = bad ? `${bad} shift${bad > 1 ? "s" : ""} this month still need a fix (red dots on the calendar). Fix them before paying.` : "";
     const by = new Map();
     for (const s of L) { const o = by.get(s.site) || { v: new Set(), h: 0 }; o.v.add(`${s.date}|${s.start}`); o.h += hoursOf(s); by.set(s.site, o); }
     const rows = [...by].sort((a, b) => b[1].h - a[1].h);
@@ -356,16 +473,16 @@ tfoot td { font-weight: 600; border: 0 }
     $("crewList").replaceChildren(...S.crew.map((c) => {
       const em = h("input", { value: (c.emails || []).join(", "), placeholder: "Calendar emails", "aria-label": `${c.name} calendar emails` });
       const rate = S.owner ? h("input", { type: "number", step: "0.25", min: "0", value: S.rates[c.id] ?? "", placeholder: "$/h", "aria-label": `${c.name} pay rate`, style: "max-width:100px" }) : null;
-      const msg = h("span", { class: "small muted" });
+      const note = h("span", { class: "small muted" });
       const save = async () => {
         try {
           await S.db.doc("crew/" + c.id).update({ emails: em.value.split(",").map((x) => x.trim().toLowerCase()).filter(Boolean) });
           if (rate && String(S.rates[c.id] ?? "") !== rate.value) await S.db.doc("rates/" + c.id).set({ rate: Number(rate.value) || 0 });
-          msg.textContent = "Saved";
-        } catch (e) { msg.textContent = errText(e); }
+          note.textContent = "Saved";
+        } catch (e) { note.textContent = errText(e); }
       };
       em.addEventListener("change", save); if (rate) rate.addEventListener("change", save);
-      return h("div", { class: "item" }, h("b", { text: c.name }), em, h("div", { class: "row" }, rate, msg));
+      return h("div", { class: "item" }, h("b", { text: c.name }), em, h("div", { class: "row" }, rate, note));
     }));
     const q = $("sSearch").value.trim().toLowerCase();
     const all = S.sites.filter((x) => x.active !== false);
@@ -376,29 +493,6 @@ tfoot td { font-weight: 600; border: 0 }
       return h("div", { class: "item" }, h("span", { text: x.name }), ad, h("span"));
     }), q ? null : h("div", { class: "small muted", text: `Showing 10 of ${all.length} clients. Search to find the rest.` }));
   }
-
-  // ---------- add hours ----------
-  $("aClient").addEventListener("input", () => { const x = site($("aClient").value.trim()); $("aAddr").textContent = x && x.address ? x.address : ""; });
-  $("addForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const who = [...$("aWho").querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
-    const m = $("aMsg"), name = $("aClient").value.trim();
-    if (!site(name)) { m.className = "msg bad"; m.textContent = "Pick the client from the list. New clients go in Settings."; return; }
-    if (!who.length) { m.className = "msg bad"; m.textContent = "Tap who worked."; return; }
-    const base = { site: name, date: $("aDate").value, start: $("aStart").value, end: $("aEnd").value, breakMin: 0, note: "",
-      status: "confirmed", source: "manual", createdAt: new Date().toISOString() };
-    $("aSave").disabled = true;
-    try {
-      for (const crew of who) await S.db.collection("shifts").add({ ...base, crew });
-      m.className = "msg ok"; m.textContent = `Saved ${fmt(hoursOf(base))} h for ${who.map(crewName).join(", ")}.`;
-      $("aClient").value = ""; $("aAddr").textContent = ""; $("aStart").value = ""; $("aEnd").value = "";
-      for (const b of $("aWho").children) b.setAttribute("aria-pressed", "false");
-      const ws = mondayOf(parse(base.date));
-      if (ymd(ws) !== ymd(S.weekStart)) { S.weekStart = ws; subWeek(); }
-    } catch (err) { m.className = "msg bad"; m.textContent = errText(err); }
-    $("aSave").disabled = false;
-  });
-
   $("sSearch").addEventListener("input", () => renderSettings());
   $("crewAdd").addEventListener("submit", async (e) => { e.preventDefault();
     try { await S.db.collection("crew").add({ name: $("cName").value.trim(), role: "Floater", emails: [], active: true, order: 50 }); $("cName").value = ""; }
@@ -421,9 +515,9 @@ tfoot td { font-weight: 600; border: 0 }
   }
   async function pull(mcp) {
     const m = $("calMsg"), btn = $("calBtn");
-    const from = S.weekStart, today = addDays(mondayOf(new Date()), ((new Date().getDay() + 6) % 7) + 1);
-    const end = addDays(from, 7) < today ? addDays(from, 7) : today; // past days and today only
-    if (end <= from) { m.className = "msg"; m.textContent = "This week hasn't started yet."; return; }
+    const from = S.month, monthEnd = new Date(S.month.getFullYear(), S.month.getMonth() + 1, 1), tomorrow = addDays(parse(today()), 1);
+    const end = monthEnd < tomorrow ? monthEnd : tomorrow; // finished days and today only
+    if (end <= from) { m.className = "msg"; m.textContent = "This month hasn't started yet."; return; }
     btn.disabled = true; m.className = "msg"; m.textContent = "Reading the calendar...";
     try {
       const res = await mcp.callTool("Google Calendar", "list_events", { startTime: ymd(from) + "T00:00:00", endTime: ymd(end) + "T00:00:00", orderBy: "startTime", pageSize: 250 });
@@ -444,7 +538,7 @@ tfoot td { font-weight: 600; border: 0 }
         }
       }
       m.className = "msg ok";
-      m.textContent = added ? `Added ${added} shift${added > 1 ? "s" : ""} from the calendar. Tap anything in red to fix it.` : had ? "Everything on the calendar is already here." : "No crew jobs on the calendar for these days.";
+      m.textContent = added ? `Added ${added} shift${added > 1 ? "s" : ""} from the calendar. Days with a red dot need a quick fix.` : had ? "Everything on the calendar is already here." : "No crew jobs on the calendar this month.";
     } catch (e) {
       m.className = "msg bad";
       m.textContent = e && (e.code === "server_not_connected" || e.code === "needs_reauth") ? "Connect Google Calendar in claude.ai Settings > Connectors, then try again."
@@ -455,28 +549,21 @@ tfoot td { font-weight: 600; border: 0 }
   }
 
   // ---------- data ----------
-  function subWeek() {
-    if (S.unsubW) S.unsubW();
-    S.week = []; S.editing = null;
-    S.unsubW = S.db.collection("shifts").where("date", ">=", ymd(S.weekStart)).where("date", "<=", ymd(addDays(S.weekStart, 6))).limit(500)
-      .onSnapshot((q) => { S.week = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
+  function subscribe() {
+    if (S.unsub) S.unsub();
+    const a = S.month, b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
+    S.shifts = []; S.editing = null; S.adding = false;
+    S.unsub = S.db.collection("shifts").where("date", ">=", ymd(a)).where("date", "<=", ymd(b)).limit(1000)
+      .onSnapshot((q) => { S.shifts = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
     render();
   }
-  function subMonth() {
-    if (!S.owner) return;
-    if (S.unsubM) S.unsubM();
-    const a = S.monthStart, b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
-    S.month = [];
-    S.unsubM = S.db.collection("shifts").where("date", ">=", ymd(a)).where("date", "<=", ymd(b)).limit(1000)
-      .onSnapshot((q) => { S.month = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
-  }
+  const moveMonth = (n) => { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + n, 1); S.day = S.month.getMonth() === now.getMonth() && S.month.getFullYear() === now.getFullYear() ? today() : ymd(S.month); $("calMsg").textContent = ""; subscribe(); };
 
   $("views").addEventListener("click", (e) => { const b = e.target.closest("[data-v]"); if (b) show(b.dataset.v); });
-  $("wPrev").addEventListener("click", () => { S.weekStart = addDays(S.weekStart, -7); subWeek(); });
-  $("wNext").addEventListener("click", () => { S.weekStart = addDays(S.weekStart, 7); subWeek(); });
-  $("mPrev").addEventListener("click", () => { S.monthStart = new Date(S.monthStart.getFullYear(), S.monthStart.getMonth() - 1, 1); subMonth(); render(); });
-  $("mNext").addEventListener("click", () => { S.monthStart = new Date(S.monthStart.getFullYear(), S.monthStart.getMonth() + 1, 1); subMonth(); render(); });
-  $("aDate").value = ymd(new Date());
+  $("mode").addEventListener("click", (e) => { const b = e.target.closest("[data-m]"); if (b) { S.mode = b.dataset.m; render(); } });
+  $("mPrev").addEventListener("click", () => moveMonth(-1)); $("mNext").addEventListener("click", () => moveMonth(1));
+  $("pPrev").addEventListener("click", () => moveMonth(-1)); $("pNext").addEventListener("click", () => moveMonth(1));
+  $("addBtn").addEventListener("click", () => { S.adding = true; S.editing = null; renderDay(); });
 
   (async function boot() {
     const claude = window.claude;
@@ -489,7 +576,7 @@ tfoot td { font-weight: 600; border: 0 }
     db.collection("crew").onSnapshot((q) => { S.crew = q.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (a.order ?? 99) - (b.order ?? 99) || a.name.localeCompare(b.name)); render(); }, () => {});
     db.collection("sites").limit(1000).onSnapshot((q) => { S.sites = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
     if (S.owner) db.collection("rates").onSnapshot((q) => { S.rates = Object.fromEntries(q.docs.map((d) => [d.id, Number(d.data().rate) || 0])); render(); }, () => {});
-    subWeek(); show("hours");
+    subscribe(); show("month");
     const mcp = await claude.use("mcp");
     if (mcp) { $("calBtn").hidden = false; $("calBtn").addEventListener("click", () => pull(mcp)); }
   })();

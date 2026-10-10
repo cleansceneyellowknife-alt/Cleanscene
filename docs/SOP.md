@@ -58,11 +58,12 @@ By **6 pm** Ali confirms tomorrow's work and posts changes in **#schedule**.
 ## 6. Hours (Ali: 2 minutes a day)
 Ali is shared as a **Contributor**: he sees clients (name and address), who worked, and hours. He never sees pay rates or pay. Open **CleanScene Hours**: https://claude.ai/artifact/PWuK7VGthRHXqqd5bG61Aw
 
-One screen, one week at a time:
-1. **Bring in from calendar** adds this week's calendar jobs (one line per job, everyone who worked it). Pressing it twice never doubles anything.
-2. **Add hours** for anything not on the calendar: client, date, start, end, tap who worked, Save.
-3. Anything in **red** needs a fix. Tap it: pick the client, fix the times, or tap **Didn't happen**.
-4. New client or new crew member: **Settings**.
+A month calendar, like Google Calendar. Each day shows how many jobs, the hours, and who worked.
+1. **Bring in from calendar** adds the month's calendar jobs so far. Pressing it twice never doubles anything.
+2. Tap a day to see its jobs (client, address, times, who). **Add a job** for anything not on the calendar.
+3. A **red dot** on a day means a job needs a fix. Tap it: pick the client, fix the times, or tap **Didn't happen**.
+4. **List** shows the month as one row per day: date, jobs, hours, who worked, with the month total.
+5. New client or new crew member: **Settings**.
 
 ## 7. Payroll (monthly) and cross-check
 **1st of the month** (calendar reminder): open CleanScene Hours, **Pay**, go back one month (Adam only).
