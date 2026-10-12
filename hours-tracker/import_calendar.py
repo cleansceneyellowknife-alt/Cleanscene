@@ -60,6 +60,8 @@ SITE_KEYWORDS = [
     ("marks", "CT REIT - Mark's Yellowknife"),
     ("boston pizza", "Boston Pizza Yellowknife"),
     ("212 woolgar", "Danielle Desmarais"),
+    ("northview", "Northview Residential (NHF LP)"),
+    ("pharmacy", "Sutherland's Drugs"),
 ]
 
 
