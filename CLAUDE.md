@@ -7,6 +7,7 @@ Read this first. It is the source of truth for decisions already made.
 - Two regions: Richmond/Vancouver, BC and Yellowknife, NT. Owner: Adam (operations, quoting, contracts, client service).
 - Ali is the main manager (also works shifts, $28/h) and logs crew hours. The rest of the crew are mostly floaters ($25/h). Only Adam and Ali may see hours and pay data.
 - Pay is monthly (calendar month). Open shifts are manager-assigned, not first-come-first-served.
+- Ermalyn is not tracked on NACC jobs (Adam, 2026-10-12): the app skips her NACC calendar invites (`crew/ermalyn.skipSites`), and the spreadsheet importer has the same SKIP rule.
 
 ## The target system (decided)
 | Layer | Tool | Notes |

@@ -529,10 +529,13 @@ tfoot td { font-weight: 600; border: 0 }
         const st = ev.start && ev.start.dateTime, en = ev.end && ev.end.dateTime;
         if (!st || !en) continue;
         const crewIds = [...new Set((ev.attendees || []).filter((a) => a.responseStatus !== "declined").map((a) => byEmail[(a.email || "").toLowerCase()]).filter(Boolean))];
+        const where = siteForEvent(ev);
         for (const crew of crewIds) {
+          const c = S.crew.find((x) => x.id === crew) || {};
+          if ((c.skipSites || []).includes(where)) continue; // e.g. not tracked for this client
           const ref = S.db.doc("shifts/" + ("cal_" + ev.id + "_" + crew).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190));
           if ((await ref.get()).exists) { had++; continue; }
-          await ref.set({ date: st.slice(0, 10), start: st.slice(11, 16), end: en.slice(11, 16), breakMin: 0, crew, site: siteForEvent(ev),
+          await ref.set({ date: st.slice(0, 10), start: st.slice(11, 16), end: en.slice(11, 16), breakMin: 0, crew, site: where,
             note: "", status: "scheduled", source: "calendar", calTitle: (ev.summary || "").slice(0, 140), createdAt: new Date().toISOString() });
           added++;
         }
@@ -554,7 +557,7 @@ tfoot td { font-weight: 600; border: 0 }
     const a = S.month, b = new Date(a.getFullYear(), a.getMonth() + 1, 0);
     S.shifts = []; S.editing = null; S.adding = false;
     S.unsub = S.db.collection("shifts").where("date", ">=", ymd(a)).where("date", "<=", ymd(b)).limit(1000)
-      .onSnapshot((q) => { S.shifts = q.docs.map((d) => ({ id: d.id, ...d.data() })); render(); }, () => {});
+      .onSnapshot((q) => { S.shifts = q.docs.map((d) => ({ id: d.id, ...d.data() })).filter((s) => s.status !== "removed"); render(); }, () => {});
     render();
   }
   const moveMonth = (n) => { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + n, 1); S.day = S.month.getMonth() === now.getMonth() && S.month.getFullYear() === now.getFullYear() ? today() : ymd(S.month); $("calMsg").textContent = ""; subscribe(); };

@@ -29,6 +29,9 @@ CREW = {
     "alijan0987as@gmail.com": "Ali",  # Ali's second account
 }
 
+# (employee, site) pairs never imported: Ermalyn is not tracked on NACC jobs (Adam, 2026-10-12).
+SKIP = {("Ermalyn Villanueva", "NACC")}
+
 # First matching keyword (in event title or location, case-insensitive) -> Sites tab name.
 SITE_KEYWORDS = [
     ("allain", "École Allain St-Cyr, CSFTNO"),
@@ -79,6 +82,8 @@ def rows_from(events, start, end):
         for att in ev.get("attendees") or []:
             name = CREW.get((att.get("email") or "").lower())
             if not name or att.get("responseStatus") == "declined":
+                continue
+            if (name, site_for(ev)) in SKIP:
                 continue
             yield (s.date(), name, site_for(ev), s.time().replace(tzinfo=None),
                    e.time().replace(tzinfo=None), f"From calendar: {ev.get('summary', '').strip()}")
