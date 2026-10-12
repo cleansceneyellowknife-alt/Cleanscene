@@ -247,18 +247,19 @@ tfoot td { font-weight: 600; border: 0 }
   const now = new Date();
   const S = { db: null, owner: false, view: "month", mode: "cal", crew: [], sites: [], rates: {}, shifts: [],
     month: new Date(now.getFullYear(), now.getMonth(), 1), day: today(), editing: null, adding: false, confirmDel: false, unsub: null };
-  const crewName = (id) => (S.crew.find((c) => c.id === id) || {}).name || "Unknown";
-  const firstName = (id) => crewName(id).split(" ")[0];
+  const crewName = (id) => !id ? "Open spot" : (S.crew.find((c) => c.id === id) || {}).name || "Unknown";
+  const firstName = (id) => !id ? "Open" : crewName(id).split(" ")[0];
   const site = (name) => S.sites.find((x) => x.name === name);
   const live = (list) => list.filter((s) => s.status !== "cancelled");
 
   function problem(s) {
-    if (!s.site || !s.start || !s.end || !s.crew) return "Missing details";
+    if (!s.crew) return "Open spot: tap to pick who worked";
+    if (!s.site || !s.start || !s.end) return "Missing details";
     if (!site(s.site)) return "Tap to pick the client from the list";
     const hh = hoursOf(s);
     if (hh <= 0) return "Check the times";
     if (hh > 12) return "Over 12 hours: check the times";
-    if (S.shifts.filter((x) => x.status !== "cancelled" && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
+    if (S.shifts.filter((x) => x.status !== "cancelled" && x.crew && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
     return "";
   }
   // A job = one client visit on one day at one time; it can have several people.
@@ -275,7 +276,7 @@ tfoot td { font-weight: 600; border: 0 }
     const all = S.shifts.filter((s) => s.date === date);
     const L = live(all);
     const jobs = jobsOf(L).length;
-    const hours = L.reduce((a, s) => a + hoursOf(s), 0);
+    const hours = L.reduce((a, s) => a + (s.crew ? hoursOf(s) : 0), 0);
     const who = [...new Set(L.map((s) => s.crew))];
     const flag = L.some((s) => problem(s));
     return { all, jobs, hours, who, flag };
@@ -302,9 +303,9 @@ tfoot td { font-weight: 600; border: 0 }
     $("mLabel").textContent = label;
     const L = live(S.shifts);
     const per = {};
-    for (const s of L) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
+    for (const s of L) if (s.crew) per[s.crew] = (per[s.crew] || 0) + hoursOf(s);
     const days = new Set(L.map((s) => s.date)).size;
-    const stats = [[String(jobsOf(L).length), "Jobs"], [fmt(L.reduce((a, s) => a + hoursOf(s), 0)), "Hours"], [String(days), "Days worked"]];
+    const stats = [[String(jobsOf(L).length), "Jobs"], [fmt(L.reduce((a, s) => a + (s.crew ? hoursOf(s) : 0), 0)), "Hours"], [String(days), "Days worked"]];
     $("mStats").replaceChildren(...stats.map(([v, l]) => h("div", {}, h("b", { text: v }), h("span", { text: l }))));
     $("mPeople").replaceChildren(...Object.entries(per).sort((a, b) => b[1] - a[1]).map(([id, v]) => h("span", {}, crewName(id), h("b", { text: fmt(v) + " h" }))));
     for (const b of $("mode").children) b.setAttribute("aria-pressed", String(b.dataset.m === S.mode));
@@ -413,13 +414,15 @@ tfoot td { font-weight: 600; border: 0 }
   function editForm(g) {
     const s = g.items[0];
     const msg = h("div", { class: "msg", role: "status" });
+    const chips = crewChips(new Set(g.items.map((x) => x.crew).filter(Boolean)));
     const f = h("form", { class: "edit" },
       h("label", {}, "Client", h("input", { id: "eClient", list: "clientList", value: site(s.site) ? s.site : "", placeholder: s.calTitle ? `Calendar said: ${s.calTitle}` : "Type a client name" })),
       h("div", { class: "three" },
         h("label", {}, "Date", h("input", { id: "eDate", type: "date", value: s.date })),
         h("label", {}, "Start", h("input", { id: "eStart", type: "time", value: s.start || "" })),
         h("label", {}, "End", h("input", { id: "eEnd", type: "time", value: s.end || "" }))),
-      h("div", { class: "small muted", text: "Worked by " + g.items.map((x) => crewName(x.crew)).join(", ") }),
+      h("div", { style: "display:grid;gap:6px" }, h("span", { class: "small muted", style: "font-weight:600", text: "Who worked" }), chips,
+        g.items.some((x) => !x.crew && x.note) ? h("span", { class: "small muted", text: g.items.filter((x) => !x.crew && x.note).map((x) => x.note).join(" · ") }) : null),
       h("div", { class: "row" },
         h("button", { class: "btn go", type: "submit" }, "Save"),
         h("button", { class: "btn", type: "button", onclick: () => { S.editing = null; render(); } }, "Close"),
@@ -432,12 +435,35 @@ tfoot td { font-weight: 600; border: 0 }
       e.preventDefault();
       const name = $("eClient").value.trim();
       if (!site(name)) { msg.className = "msg bad"; msg.textContent = "Pick the client from the list."; return; }
-      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" }, msg);
+      const who = [...chips.querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
+      if (!who.length) { msg.className = "msg bad"; msg.textContent = "Tap who worked."; return; }
+      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" }, msg, who);
     });
     return f;
   }
-  async function saveAll(g, data, msg) {
-    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: new Date().toISOString() }); S.editing = null; document.activeElement?.blur(); render(); }
+  // who (optional): the people who worked. Open spots are filled first; anyone left over gets a new shift, unpicked people and unfilled open spots are removed.
+  async function saveAll(g, data, msg, who) {
+    try {
+      const at = new Date().toISOString();
+      let keep = g.items, drop = [];
+      if (who) {
+        const want = new Set(who), have = new Set(g.items.map((x) => x.crew).filter(Boolean));
+        const fill = who.filter((c) => !have.has(c));
+        keep = []; const extra = [];
+        for (const x of g.items) {
+          if (x.crew && want.has(x.crew)) keep.push(x);
+          else if (!x.crew && fill.length) extra.push([x, fill.shift()]);
+          else drop.push(x);
+        }
+        for (const [x, crew] of extra) await S.db.doc("shifts/" + x.id).update({ ...data, crew, updatedAt: at });
+        const s0 = g.items[0];
+        for (const crew of fill) await S.db.collection("shifts").add({ date: s0.date, start: s0.start, end: s0.end, breakMin: Number(s0.breakMin) || 0, site: s0.site, note: "",
+          status: "confirmed", source: "manual", calTitle: s0.calTitle || "", createdAt: at, ...data, crew });
+      }
+      for (const s of keep) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: at });
+      for (const s of drop) await S.db.doc("shifts/" + s.id).delete();
+      S.editing = null; document.activeElement?.blur(); render();
+    }
     catch (e) { msg.className = "msg bad"; msg.textContent = errText(e); }
   }
   async function removeAll(g, btn, msg) {
@@ -450,7 +476,7 @@ tfoot td { font-weight: 600; border: 0 }
   function renderPay() {
     $("pLabel").textContent = `${MONTHS[S.month.getMonth()]} ${S.month.getFullYear()}`;
     const L = live(S.shifts), per = {}, days = {};
-    for (const s of L) { per[s.crew] = (per[s.crew] || 0) + hoursOf(s); (days[s.crew] = days[s.crew] || new Set()).add(s.date); }
+    for (const s of L) if (s.crew) { per[s.crew] = (per[s.crew] || 0) + hoursOf(s); (days[s.crew] = days[s.crew] || new Set()).add(s.date); }
     let th = 0, tp = 0;
     $("payBody").replaceChildren(...S.crew.filter((c) => per[c.id] || c.active !== false).map((c) => {
       const hh = per[c.id] || 0, r = Number(S.rates[c.id]) || 0; th += hh; tp += hh * r;
@@ -528,15 +554,23 @@ tfoot td { font-weight: 600; border: 0 }
       for (const ev of events) {
         const st = ev.start && ev.start.dateTime, en = ev.end && ev.end.dateTime;
         if (!st || !en) continue;
-        const crewIds = [...new Set((ev.attendees || []).filter((a) => a.responseStatus !== "declined").map((a) => byEmail[(a.email || "").toLowerCase()]).filter(Boolean))];
+        // Only crew set to "assign" (Ali, Ermalyn) are put on a job from the calendar; anyone else invited becomes an open spot for Ali to fill.
+        // alwaysSites: Ermalyn does every NACC job, invited or not. Events with nobody to assign (meetings etc.) are skipped.
         const where = siteForEvent(ev);
-        for (const crew of crewIds) {
-          const c = S.crew.find((x) => x.id === crew) || {};
-          if ((c.skipSites || []).includes(where)) continue; // e.g. not tracked for this client
-          const ref = S.db.doc("shifts/" + ("cal_" + ev.id + "_" + crew).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190));
+        const invited = (ev.attendees || []).filter((a) => a.responseStatus !== "declined" && !a.organizer && !a.resource && a.email);
+        const assign = new Set(), open = [];
+        for (const a of invited) {
+          const c = S.crew.find((x) => x.id === byEmail[a.email.toLowerCase()]);
+          if (c && c.calendar === "assign") assign.add(c.id); else open.push(a.email.toLowerCase());
+        }
+        for (const c of S.crew) if (c.active !== false && (c.alwaysSites || []).includes(where)) assign.add(c.id);
+        if (!assign.size) continue;
+        const rows = [...assign].map((crew) => [crew, crew, ""]).concat(open.map((em) => ["", "open_" + em.split("@")[0], "Calendar invited " + em]));
+        for (const [crew, key, note] of rows) {
+          const ref = S.db.doc("shifts/" + ("cal_" + ev.id + "_" + key).replace(/[^A-Za-z0-9_\-.~:@+]/g, "_").slice(0, 190));
           if ((await ref.get()).exists) { had++; continue; }
           await ref.set({ date: st.slice(0, 10), start: st.slice(11, 16), end: en.slice(11, 16), breakMin: 0, crew, site: where,
-            note: "", status: "scheduled", source: "calendar", calTitle: (ev.summary || "").slice(0, 140), createdAt: new Date().toISOString() });
+            note, status: "scheduled", source: "calendar", calTitle: (ev.summary || "").slice(0, 140), createdAt: new Date().toISOString() });
           added++;
         }
       }

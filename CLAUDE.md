@@ -7,7 +7,7 @@ Read this first. It is the source of truth for decisions already made.
 - Two regions: Richmond/Vancouver, BC and Yellowknife, NT. Owner: Adam (operations, quoting, contracts, client service).
 - Ali is the main manager (also works shifts, $28/h) and logs crew hours. The rest of the crew are mostly floaters ($25/h). Only Adam and Ali may see hours and pay data.
 - Pay is monthly (calendar month). Open shifts are manager-assigned, not first-come-first-served.
-- Ermalyn is not tracked on NACC jobs (Adam, 2026-10-12): the app skips her NACC calendar invites (`crew/ermalyn.skipSites`), and the spreadsheet importer has the same SKIP rule.
+- Crew assignment rule (Adam, 2026-10-12): only Ali (and Ermalyn when she is scheduled) is put on a job from the calendar. Ermalyn does every NACC job (`crew/ermalyn.alwaysSites`). Anyone else invited becomes an open spot (shift with empty `crew`) that Ali fills in the app. Crew docs with `calendar: "assign"` are auto-assigned.
 
 ## The target system (decided)
 | Layer | Tool | Notes |
@@ -33,7 +33,7 @@ Status (2026-10-10):
 - Jobber tags added: `Move-to-Jobber-schedule` (18 clients whose recurring work is only in Calendar), `Commercial`/`Residential` on those, `Billing-check` on NACC and Stanton.
 - Adam's calendar: weekly review (Mon 9:00), monthly payroll + commercial invoices (1st, 9:00), billing check (2026-10-13).
 - No connector can create a Google Sheet file; the tracker ships as .xlsx. Slack Lists were refused for employee hours (privacy).
-- CleanScene Hours backfilled 2026-10-12 from Google Calendar, Jan 1 to Oct 11 2026: 1,102 active shifts (Jan 62, Feb 90, Mar 92, Apr 109, May 125, Jun 146, Jul 163, Aug 142, Sep 126, Oct 1-11 47). 122 calendar jobs matched no client and show a red dot for Ali to fix; 26 events with no crew invited were skipped. Two calendar-only crew added at $25/h, names to confirm with Adam: `crew/hanad` (hanadnur12@hotmail.com) and `crew/ladyann` (ladyanndelacruz1931@gmail.com). Ali's sheet was not cross-checked (still .xlsx, see open items).
+- CleanScene Hours backfilled 2026-10-12 from Google Calendar, Jan 1 to Oct 11 2026: 1,102 active shifts (Jan 62, Feb 90, Mar 92, Apr 109, May 125, Jun 146, Jul 163, Aug 142, Sep 126, Oct 1-11 47). 122 calendar jobs matched no client and show a red dot for Ali to fix; 26 events with no crew invited were skipped. Hanad's 9 "Full court - Biweekly Marketing meeting" invites were not jobs and were deleted; Lady Ann's May 31 Logan Shupe move-out is an open spot. Ermalyn's two NACC load-out cleans (Oct 1, Oct 3) are restored. Ali's sheet was not cross-checked (still .xlsx, see open items).
 
 ## Conventions
 - Hours Tracker tab and column names are fixed: `Hours Log` (A Date, B Employee, C Client / Site, D Start, E End, F Break (min), G Hours, H Region, I Week of (Mon), J Jobber visit # / note, K Check, L hidden visit helper), `Staff`, `Sites`, `Pay Period`, `Weekly`, `Start Here`. Formulas are pre-filled in rows 2–2001 of `Hours Log`; new shifts go in the first row where column A is empty, never appended after row 2001.

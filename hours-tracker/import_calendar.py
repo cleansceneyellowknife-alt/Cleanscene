@@ -29,8 +29,8 @@ CREW = {
     "alijan0987as@gmail.com": "Ali",  # Ali's second account
 }
 
-# (employee, site) pairs never imported: Ermalyn is not tracked on NACC jobs (Adam, 2026-10-12).
-SKIP = {("Ermalyn Villanueva", "NACC")}
+# (employee, site) pairs never imported. Empty: Ermalyn does all NACC jobs (Adam, 2026-10-12).
+SKIP = set()
 
 # First matching keyword (in event title or location, case-insensitive) -> Sites tab name.
 SITE_KEYWORDS = [

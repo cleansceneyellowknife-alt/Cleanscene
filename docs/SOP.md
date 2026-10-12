@@ -60,6 +60,7 @@ Ali is shared as a **Contributor**: he sees clients (name and address), who work
 
 A month calendar, like Google Calendar. Each day shows how many jobs, the hours, and who worked.
 1. **Bring in from calendar** adds the month's calendar jobs so far. Pressing it twice never doubles anything.
+   - Ali is put on his jobs; Ermalyn on hers and on every NACC job. Anyone else invited shows as an **Open spot**: tap the job and pick who worked.
 2. Tap a day to see its jobs (client, address, times, who). **Add a job** for anything not on the calendar.
 3. A **red dot** on a day means a job needs a fix. Tap it: pick the client, fix the times, or tap **Didn't happen**.
 4. **List** shows the month as one row per day: date, jobs, hours, who worked, with the month total.
