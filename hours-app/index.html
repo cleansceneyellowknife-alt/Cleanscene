@@ -108,6 +108,29 @@ tbody tr.click:hover td { background: var(--sunk) }
 tfoot td { font-weight: 600; border: 0 }
 .tbl { overflow-x: auto }
 .list-edit { display: grid; gap: 8px }
+/* Crew on a job: one row per person with their own hours (like a column in Ali's sheet) */
+.crewrows { display: grid; gap: 6px }
+.crewrow { display: grid; grid-template-columns: minmax(0, 1fr) 96px 40px; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border: 1px solid var(--line); border-radius: 10px }
+.crewrow.open { border-style: dashed; border-color: var(--bad) }
+.crewrow .nm { font-weight: 600; overflow-wrap: anywhere }
+.crewrow input { padding: 8px 10px; text-align: right; font-family: var(--mono) }
+.x { border: 0; background: none; color: var(--muted); font-size: 1.3rem; cursor: pointer; border-radius: 8px; height: 40px }
+.x:hover { background: var(--sunk); color: var(--bad) }
+.jobtotal { display: flex; justify-content: space-between; font-weight: 600; padding: 0 4px }
+.job .ppl { grid-column: 1 / -1; font-size: .88rem; overflow-wrap: anywhere }
+/* Sheet view: rows = jobs, one column per person, totals at the bottom */
+.sheet table { font-size: .88rem; width: max-content; min-width: 100% }
+.sheet th, .sheet td { padding: 7px 9px }
+.sheet th.p, .sheet td.p { text-align: center; min-width: 64px; font-family: var(--mono); font-variant-numeric: tabular-nums }
+.sheet th.p { font-family: var(--body); text-transform: none; letter-spacing: 0; font-size: .8rem; white-space: normal; max-width: 90px; vertical-align: bottom }
+.sheet td:first-child, .sheet th:first-child { position: sticky; left: 0; background: var(--card); z-index: 1; min-width: 150px; max-width: 200px; box-shadow: 1px 0 0 var(--line) }
+.sheet tbody tr.click:hover td:first-child { background: var(--sunk) }
+.sheet .sd { font: 600 .72rem var(--body); text-transform: uppercase; letter-spacing: .06em; color: var(--accent) }
+.sheet .cl { font-weight: 600; overflow-wrap: anywhere }
+.sheet td.tot { font-weight: 600; background: var(--sunk) }
+.sheet tr.newday td { border-top: 2px solid var(--line) }
+.sheet tfoot td { border-top: 2px solid var(--ink); background: var(--card) }
+.sheet .fl { color: var(--bad); font-weight: 700 }
 .list-edit .item { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 8px; align-items: center }
 @media (max-width: 480px) { .list-edit .item { grid-template-columns: 1fr } }
 </style>
@@ -138,6 +161,7 @@ tfoot td { font-weight: 600; border: 0 }
         <div class="seg" id="mode">
           <button aria-pressed="true" data-m="cal">Calendar</button>
           <button aria-pressed="false" data-m="list">List</button>
+          <button aria-pressed="false" data-m="sheet">Sheet</button>
         </div>
         <button class="btn" id="calBtn" hidden>Bring in from calendar</button>
       </div>
@@ -145,6 +169,9 @@ tfoot td { font-weight: 600; border: 0 }
       <div id="calView">
         <div class="dow"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
         <div class="grid" id="grid" style="margin-top:4px"></div>
+      </div>
+      <div id="sheetView" class="tbl sheet" hidden>
+        <table><thead id="shHead"></thead><tbody id="shBody"></tbody><tfoot id="shFoot"></tfoot></table>
       </div>
       <div id="listView" class="tbl" hidden>
         <table>
@@ -194,7 +221,7 @@ tfoot td { font-weight: 600; border: 0 }
   <div id="pSet" class="stack" hidden>
     <section class="card">
       <h2 style="font-size:1.05rem">Crew</h2>
-      <p class="small muted" style="margin:0">Calendar emails let "Bring in from calendar" know who worked.</p>
+      <p class="small muted" style="margin:0">Everyone Ali puts on jobs. You can also add a person straight from a job. Calendar emails are optional.</p>
       <div class="list-edit" id="crewList"></div>
       <form class="row" id="crewAdd"><input id="cName" placeholder="New person's name" required style="flex:1 1 200px"><button class="btn" type="submit">Add person</button></form>
     </section>
@@ -237,7 +264,8 @@ tfoot td { font-weight: 600; border: 0 }
   const shortDay = (s) => parse(s).toLocaleDateString("en-CA", { weekday: "short", month: "short", day: "numeric" });
   const t12 = (t) => { if (!t) return "--"; let [a, b] = t.split(":").map(Number); const p = a >= 12 ? "pm" : "am"; a = a % 12 || 12; return b ? `${a}:${pad(b)}${p}` : `${a}${p}`; };
   const toMin = (t) => { if (!t) return null; const [a, b] = t.split(":").map(Number); return a * 60 + b; };
-  const hoursOf = (s) => { const a = toMin(s.start), b = toMin(s.end); if (a == null || b == null) return 0; return Math.round((((b - a + 1440) % 1440) - (Number(s.breakMin) || 0)) / 60 * 100) / 100; };
+  const hoursOf = (s) => (s.hours != null && s.hours !== "") ? Number(s.hours) || 0 : spanOf(s);
+  const spanOf = (s) => { const a = toMin(s.start), b = toMin(s.end); if (a == null || b == null) return 0; return Math.round((((b - a + 1440) % 1440) - (Number(s.breakMin) || 0)) / 60 * 100) / 100; };
   const fmt = (n) => (Math.round(n * 100) / 100).toFixed(2);
   const fmtShort = (n) => { const r = Math.round(n * 100) / 100; return Number.isInteger(r) ? String(r) : r.toFixed(r * 10 % 1 ? 2 : 1); };
   const money = (n) => "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -254,11 +282,11 @@ tfoot td { font-weight: 600; border: 0 }
 
   function problem(s) {
     if (!s.crew) return "Open spot: tap to pick who worked";
-    if (!s.site || !s.start || !s.end) return "Missing details";
-    if (!site(s.site)) return "Tap to pick the client from the list";
+    if (!s.site) return "Missing the client";
+    if (!site(s.site) && s.status !== "confirmed") return "Tap to pick the client from the list";
     const hh = hoursOf(s);
-    if (hh <= 0) return "Check the times";
-    if (hh > 12) return "Over 12 hours: check the times";
+    if (hh <= 0) return "Check the hours";
+    if (hh > 12) return "Over 12 hours: check the hours";
     if (S.shifts.filter((x) => x.status !== "cancelled" && x.crew && x.date === s.date && x.crew === s.crew && x.site === s.site).length > 1) return "Entered twice?";
     return "";
   }
@@ -266,7 +294,7 @@ tfoot td { font-weight: 600; border: 0 }
   function jobsOf(list) {
     const m = new Map();
     for (const s of list) {
-      const k = `${s.date}|${s.site}|${s.start}|${s.end}|${s.status === "cancelled" ? "x" : ""}`;
+      const k = `${s.date}|${s.site}|${s.start || ""}|${s.end || ""}|${s.status === "cancelled" ? "x" : ""}`;
       if (!m.has(k)) m.set(k, { key: k, items: [] });
       m.get(k).items.push(s);
     }
@@ -309,7 +337,8 @@ tfoot td { font-weight: 600; border: 0 }
     $("mStats").replaceChildren(...stats.map(([v, l]) => h("div", {}, h("b", { text: v }), h("span", { text: l }))));
     $("mPeople").replaceChildren(...Object.entries(per).sort((a, b) => b[1] - a[1]).map(([id, v]) => h("span", {}, crewName(id), h("b", { text: fmt(v) + " h" }))));
     for (const b of $("mode").children) b.setAttribute("aria-pressed", String(b.dataset.m === S.mode));
-    $("calView").hidden = S.mode !== "cal"; $("listView").hidden = S.mode !== "list";
+    $("calView").hidden = S.mode !== "cal"; $("listView").hidden = S.mode !== "list"; $("sheetView").hidden = S.mode !== "sheet";
+    if (S.mode === "sheet") renderSheet();
 
     // calendar grid
     const first = new Date(m.getFullYear(), m.getMonth(), 1), last = new Date(m.getFullYear(), m.getMonth() + 1, 0);
@@ -346,16 +375,51 @@ tfoot td { font-weight: 600; border: 0 }
     $("listFoot").replaceChildren(h("tr", {}, h("td", { text: "Month total" }), h("td", { class: "n", text: tj }), h("td", { class: "n", text: fmt(th) }), h("td")));
   }
 
+  // Sheet: like Ali's spreadsheet. One row per job, one column per person, total hours per person at the bottom.
+  function openJob(g) {
+    S.day = g.items[0].date; S.editing = g.key; S.adding = false; S.confirmDel = false; render();
+    $("dayCard").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function renderSheet() {
+    const L = live(S.shifts);
+    const jobs = jobsOf(L).sort((a, b) => (a.items[0].date + (a.items[0].start || "")).localeCompare(b.items[0].date + (b.items[0].start || "")));
+    const has = new Set(L.map((s) => s.crew));
+    const cols = S.crew.filter((c) => has.has(c.id) || c.active !== false).map((c) => c.id);
+    if (has.has("")) cols.push("");
+    $("shHead").replaceChildren(h("tr", {}, h("th", { text: "Date / client" }), h("th", { class: "p", text: "Total h" }), ...cols.map((id) => h("th", { class: "p", text: crewName(id) }))));
+    const tot = {}; let grand = 0, last = "";
+    const rows = jobs.map((g) => {
+      const s = g.items[0], per = {};
+      for (const x of g.items) per[x.crew] = (per[x.crew] || 0) + (x.crew ? hoursOf(x) : 1);
+      const jt = g.items.reduce((a, x) => a + (x.crew ? hoursOf(x) : 0), 0); grand += jt;
+      for (const id of cols) if (per[id] != null) tot[id] = (tot[id] || 0) + per[id];
+      const newDay = s.date !== last; last = s.date;
+      const warn = g.items.some((x) => problem(x));
+      const addr = (site(s.site) || {}).address;
+      return h("tr", { class: "click" + (newDay ? " newday" : ""), onclick: () => openJob(g), title: "Tap to edit" },
+        h("td", {}, newDay ? h("div", { class: "sd", text: shortDay(s.date) }) : null,
+          h("div", { class: "cl" }, warn ? h("span", { class: "fl", text: "• " }) : null, s.site || "No client"),
+          addr ? h("div", { class: "small muted", text: addr }) : null),
+        h("td", { class: "p tot", text: fmtShort(jt) }),
+        ...cols.map((id) => h("td", { class: "p", text: per[id] == null ? "" : id ? fmtShort(per[id]) : per[id] + " open" })));
+    });
+    $("shBody").replaceChildren(...(rows.length ? rows : [h("tr", {}, h("td", { colspan: cols.length + 2, class: "empty", text: "No jobs logged this month yet." }))]));
+    $("shFoot").replaceChildren(h("tr", {}, h("td", { text: "Total hours" }), h("td", { class: "p tot", text: fmtShort(grand) }),
+      ...cols.map((id) => h("td", { class: "p", text: tot[id] == null ? "0" : id ? fmtShort(tot[id]) : tot[id] + " open" }))));
+  }
+
   function renderDay() {
     const inMonth = S.day.slice(0, 7) === ymd(S.month).slice(0, 7);
     if (!inMonth) S.day = ymd(S.month);
     const st = dayStats(S.day);
     $("dTitle").textContent = longDay(S.day);
     $("dSummary").replaceChildren(...(st.jobs ? [h("b", { text: st.jobs }), ` job${st.jobs > 1 ? "s" : ""} · `, h("b", { text: fmt(st.hours) }), " hours · ", st.who.map(crewName).join(", ")] : ["Nothing logged for this day."]));
-    if ($("dJobs").contains(document.activeElement) && document.activeElement.tagName === "INPUT") return; // don't wipe a form being typed in
+    const formKey = S.adding ? "new" : S.editing || "";
+    if (formKey && $("dJobs").dataset.form === formKey && $("dJobs").querySelector("form.edit")) return; // a job form is open: don't wipe it
+    $("dJobs").dataset.form = formKey;
     const parts = [];
-    if (S.adding) parts.push(addForm());
-    for (const g of jobsOf(st.all)) parts.push(S.editing === g.key ? editForm(g) : jobCard(g));
+    if (S.adding) parts.push(jobForm(null));
+    for (const g of jobsOf(st.all)) parts.push(S.editing === g.key ? jobForm(g) : jobCard(g));
     if (!parts.length) parts.push(h("div", { class: "empty", text: "No jobs. Tap Add a job, or Bring in from calendar." }));
     $("dJobs").replaceChildren(...parts);
   }
@@ -364,106 +428,112 @@ tfoot td { font-weight: 600; border: 0 }
     const s = g.items[0], cancelled = s.status === "cancelled";
     const warn = cancelled ? "" : g.items.map(problem).find(Boolean) || "";
     const addr = (site(s.site) || {}).address;
-    return h("button", { type: "button", class: "job" + (warn ? " flag" : ""), style: cancelled ? "opacity:.55" : null, onclick: () => { S.editing = g.key; S.adding = false; S.confirmDel = false; render(); } },
+    const tot = g.items.reduce((a, x) => a + (x.crew ? hoursOf(x) : 0), 0);
+    const time = s.start && s.end ? `${t12(s.start)}–${t12(s.end)}` : "";
+    return h("button", { type: "button", class: "job" + (warn ? " flag" : ""), style: cancelled ? "opacity:.55" : null, onclick: () => openJob(g) },
       h("div", { class: "client", text: (s.site || "No client") + (cancelled ? " (didn't happen)" : "") }),
-      h("div", { class: "h", text: g.items.length > 1 ? `${fmt(hoursOf(s))} h × ${g.items.length}` : `${fmt(hoursOf(s))} h` }),
-      h("div", { class: "sub", text: [`${t12(s.start)}–${t12(s.end)}`, g.items.map((x) => crewName(x.crew)).join(", "), addr].filter(Boolean).join(" · ") }),
+      h("div", { class: "h", text: `${fmt(tot)} h` }),
+      time || addr ? h("div", { class: "sub", text: [time, addr].filter(Boolean).join(" · ") }) : null,
+      h("div", { class: "ppl", text: g.items.map((x) => x.crew ? `${crewName(x.crew)} ${fmtShort(hoursOf(x))}h` : "Open spot").join(" · ") }),
       warn ? h("div", { class: "warn", text: warn }) : null);
   }
 
-  function crewChips(selected) {
-    return h("div", { class: "chips" }, ...S.crew.filter((c) => c.active !== false).map((c) => h("button", { type: "button", class: "chip", "data-id": c.id,
-      "aria-pressed": String(selected.has(c.id)), onclick: (e) => e.currentTarget.setAttribute("aria-pressed", String(e.currentTarget.getAttribute("aria-pressed") !== "true")) }, c.name)));
-  }
-
-  function addForm() {
-    const addr = h("div", { class: "small muted" });
-    const client = h("input", { id: "nClient", list: "clientList", placeholder: "Type a client name", required: true });
-    client.addEventListener("input", () => { const x = site(client.value.trim()); addr.textContent = x && x.address ? x.address : ""; });
-    const chips = crewChips(new Set());
+  // One form for adding and editing a job. Ali puts each person on the job with their own hours.
+  function jobForm(g) {
+    const s = g ? g.items[0] : { date: S.day, start: "", end: "", site: "" };
     const msg = h("div", { class: "msg", role: "status" });
+    const bad = (t) => { msg.className = "msg bad"; msg.textContent = t; };
+    const addr = h("div", { class: "small muted" });
+    const client = h("input", { id: "jClient", list: "clientList", value: g && (site(s.site) || s.status === "confirmed" || s.source === "manual") ? s.site : "",
+      placeholder: s.calTitle ? `Calendar said: ${s.calTitle}` : "Client name or address", "aria-label": "Client" });
+    const showAddr = () => { const v = client.value.trim(), x = site(v); addr.textContent = x ? x.address || "" : v ? "Not on the client list. Fine for errands like a supply run or driving crew." : ""; };
+    client.addEventListener("input", showAddr); showAddr();
+    const date = h("input", { type: "date", value: s.date, required: true, "aria-label": "Date" });
+    const start = h("input", { type: "time", value: s.start || "", "aria-label": "Start" });
+    const end = h("input", { type: "time", value: s.end || "", "aria-label": "End" });
+    const span = () => spanOf({ start: start.value, end: end.value });
+
+    let rows = g ? g.items.map((x) => ({ id: x.id, crew: x.crew || "", hours: x.crew ? String(hoursOf(x)) : "", note: x.note || "" })) : [];
+    const list = h("div", { class: "crewrows" }), pick = h("div", { class: "chips" }), total = h("span", { class: "mono" });
+    const sum = () => { total.textContent = fmt(rows.reduce((a, r) => a + (r.crew ? Number(r.hours) || 0 : 0), 0)) + " h"; };
+    function draw(focusCrew) {
+      list.replaceChildren(...rows.map((r, i) => {
+        const hrs = r.crew ? h("input", { type: "number", step: "0.25", min: "0", inputmode: "decimal", value: r.hours, placeholder: "hrs", "aria-label": `Hours for ${crewName(r.crew)}`, "data-crew": r.crew }) : h("span");
+        if (r.crew) hrs.addEventListener("input", () => { r.hours = hrs.value; sum(); });
+        return h("div", { class: "crewrow" + (r.crew ? "" : " open") },
+          h("span", { class: "nm" }, crewName(r.crew), r.crew ? null : h("span", { class: "small muted", style: "font-weight:400", text: r.note ? ` (${r.note.replace("Calendar invited ", "invited ")}). Tap a name below.` : ". Tap a name below." })),
+          hrs,
+          h("button", { type: "button", class: "x", "aria-label": `Take ${crewName(r.crew)} off this job`, onclick: () => { rows.splice(i, 1); draw(); } }, "×"));
+      }));
+      if (!rows.length) list.append(h("div", { class: "small muted", text: "Nobody on this job yet. Tap the people who worked it." }));
+      const on = new Set(rows.map((r) => r.crew));
+      pick.replaceChildren(...S.crew.filter((c) => c.active !== false && !on.has(c.id)).map((c) => h("button", { type: "button", class: "chip", onclick: () => addPerson(c.id) }, "+ " + c.name)));
+      sum();
+      if (focusCrew) { const el = list.querySelector(`[data-crew="${focusCrew}"]`); if (el) el.focus(); }
+    }
+    function addPerson(id) {
+      const def = span() ? String(span()) : "";
+      const o = rows.findIndex((r) => !r.crew);
+      if (o >= 0) rows[o] = { ...rows[o], crew: id, hours: def }; else rows.push({ crew: id, hours: def });
+      draw(id);
+    }
+    const newName = h("input", { placeholder: "New person's name", "aria-label": "New person's name", style: "flex:1 1 160px" });
+    const addNew = async () => {
+      const name = newName.value.trim();
+      if (!name) { newName.focus(); return; }
+      const ex = S.crew.find((c) => c.name.toLowerCase() === name.toLowerCase());
+      try {
+        if (ex) { if (ex.active === false) { await S.db.doc("crew/" + ex.id).update({ active: true }); ex.active = true; } newName.value = ""; addPerson(ex.id); return; }
+        const ref = await S.db.collection("crew").add({ name, role: "Floater", emails: [], active: true, order: 50 });
+        if (!S.crew.some((c) => c.id === ref.id)) S.crew.push({ id: ref.id, name, emails: [], active: true, order: 50 });
+        newName.value = ""; addPerson(ref.id);
+      } catch (e) { bad(errText(e)); }
+    };
+    newName.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addNew(); } });
+    draw();
+
+    const cancelled = g && s.status === "cancelled";
     const f = h("form", { class: "edit", autocomplete: "off" },
-      h("h2", { style: "font-size:1rem", text: "Add a job" }),
-      h("label", {}, "Client", client), addr,
-      h("div", { class: "three" },
-        h("label", {}, "Date", h("input", { id: "nDate", type: "date", value: S.day, required: true })),
-        h("label", {}, "Start", h("input", { id: "nStart", type: "time", required: true })),
-        h("label", {}, "End", h("input", { id: "nEnd", type: "time", required: true }))),
-      h("div", { style: "display:grid;gap:6px" }, h("span", { class: "small muted", style: "font-weight:600", text: "Who worked" }), chips),
-      h("div", { class: "row" }, h("button", { class: "btn go", type: "submit" }, "Save job"), h("button", { class: "btn", type: "button", onclick: () => { S.adding = false; render(); } }, "Cancel")),
+      h("h2", { style: "font-size:1rem", text: g ? "Edit job" : "Add a job" }),
+      h("label", {}, "Client / address", client), addr,
+      h("div", { class: "three" }, h("label", {}, "Date", date), h("label", {}, "Start (optional)", start), h("label", {}, "End (optional)", end)),
+      h("div", { style: "display:grid;gap:8px" },
+        h("span", { class: "small muted", style: "font-weight:600", text: "Who worked and their hours" }),
+        list, h("div", { class: "jobtotal" }, h("span", { text: "Total hours on this job" }), total),
+        pick, h("div", { class: "row" }, newName, h("button", { type: "button", class: "btn", onclick: addNew }, "Add new person"))),
+      h("div", { class: "row" },
+        h("button", { class: "btn go", type: "submit" }, "Save job"),
+        h("button", { class: "btn", type: "button", onclick: () => { S.adding = false; S.editing = null; render(); } }, g ? "Close" : "Cancel"),
+        g ? h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: cancelled ? "confirmed" : "cancelled" }, msg) }, cancelled ? "It did happen" : "Didn't happen") : null,
+        g ? h("button", { class: "link danger", type: "button", onclick: (e) => removeAll(g, e.currentTarget, msg) }, "Delete") : null),
       msg);
     f.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const who = [...chips.querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
-      const name = client.value.trim();
-      if (!site(name)) { msg.className = "msg bad"; msg.textContent = "Pick the client from the list. New clients go in Settings."; return; }
-      if (!who.length) { msg.className = "msg bad"; msg.textContent = "Tap who worked."; return; }
-      const base = { site: name, date: $("nDate").value, start: $("nStart").value, end: $("nEnd").value, breakMin: 0, note: "", status: "confirmed", source: "manual", createdAt: new Date().toISOString() };
+      const name = client.value.trim(), people = rows.filter((r) => r.crew);
+      if (!name) return bad("Type the client or the address.");
+      if (!date.value) return bad("Pick the date.");
+      if (!people.length) return bad("Tap who worked.");
+      if (people.some((r) => !(Number(r.hours) > 0))) return bad("Put in the hours for everyone on the job.");
+      const at = new Date().toISOString();
+      const base = { site: name, date: date.value, start: start.value, end: end.value, status: "confirmed", updatedAt: at };
       try {
-        for (const crew of who) await S.db.collection("shifts").add({ ...base, crew });
-        S.adding = false; S.day = base.date;
+        const keep = new Set();
+        for (const r of rows) {
+          if (r.id) { keep.add(r.id); await S.db.doc("shifts/" + r.id).update(r.crew ? { ...base, crew: r.crew, hours: Number(r.hours) } : base); }
+          else await S.db.collection("shifts").add({ ...base, crew: r.crew, hours: Number(r.hours), breakMin: 0, note: "", source: "manual", calTitle: s.calTitle || "", createdAt: at });
+        }
+        if (g) for (const x of g.items) if (!keep.has(x.id)) await S.db.doc("shifts/" + x.id).delete();
+        S.adding = false; S.editing = null; S.day = base.date;
         const d = parse(base.date);
         if (d.getMonth() !== S.month.getMonth() || d.getFullYear() !== S.month.getFullYear()) { S.month = new Date(d.getFullYear(), d.getMonth(), 1); subscribe(); }
         render();
-      } catch (err) { msg.className = "msg bad"; msg.textContent = errText(err); }
+      } catch (err) { bad(errText(err)); }
     });
-    setTimeout(() => client.focus(), 0);
+    if (!g) setTimeout(() => client.focus(), 0);
     return f;
   }
-
-  function editForm(g) {
-    const s = g.items[0];
-    const msg = h("div", { class: "msg", role: "status" });
-    const chips = crewChips(new Set(g.items.map((x) => x.crew).filter(Boolean)));
-    const f = h("form", { class: "edit" },
-      h("label", {}, "Client", h("input", { id: "eClient", list: "clientList", value: site(s.site) ? s.site : "", placeholder: s.calTitle ? `Calendar said: ${s.calTitle}` : "Type a client name" })),
-      h("div", { class: "three" },
-        h("label", {}, "Date", h("input", { id: "eDate", type: "date", value: s.date })),
-        h("label", {}, "Start", h("input", { id: "eStart", type: "time", value: s.start || "" })),
-        h("label", {}, "End", h("input", { id: "eEnd", type: "time", value: s.end || "" }))),
-      h("div", { style: "display:grid;gap:6px" }, h("span", { class: "small muted", style: "font-weight:600", text: "Who worked" }), chips,
-        g.items.some((x) => !x.crew && x.note) ? h("span", { class: "small muted", text: g.items.filter((x) => !x.crew && x.note).map((x) => x.note).join(" · ") }) : null),
-      h("div", { class: "row" },
-        h("button", { class: "btn go", type: "submit" }, "Save"),
-        h("button", { class: "btn", type: "button", onclick: () => { S.editing = null; render(); } }, "Close"),
-        s.status === "cancelled"
-          ? h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "confirmed" }, msg) }, "It did happen")
-          : h("button", { class: "btn", type: "button", onclick: () => saveAll(g, { status: "cancelled" }, msg) }, "Didn't happen"),
-        h("button", { class: "link danger", type: "button", onclick: (e) => removeAll(g, e.currentTarget, msg) }, "Delete")),
-      msg);
-    f.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = $("eClient").value.trim();
-      if (!site(name)) { msg.className = "msg bad"; msg.textContent = "Pick the client from the list."; return; }
-      const who = [...chips.querySelectorAll('[aria-pressed="true"]')].map((b) => b.dataset.id);
-      if (!who.length) { msg.className = "msg bad"; msg.textContent = "Tap who worked."; return; }
-      saveAll(g, { site: name, date: $("eDate").value, start: $("eStart").value, end: $("eEnd").value, status: "confirmed" }, msg, who);
-    });
-    return f;
-  }
-  // who (optional): the people who worked. Open spots are filled first; anyone left over gets a new shift, unpicked people and unfilled open spots are removed.
-  async function saveAll(g, data, msg, who) {
-    try {
-      const at = new Date().toISOString();
-      let keep = g.items, drop = [];
-      if (who) {
-        const want = new Set(who), have = new Set(g.items.map((x) => x.crew).filter(Boolean));
-        const fill = who.filter((c) => !have.has(c));
-        keep = []; const extra = [];
-        for (const x of g.items) {
-          if (x.crew && want.has(x.crew)) keep.push(x);
-          else if (!x.crew && fill.length) extra.push([x, fill.shift()]);
-          else drop.push(x);
-        }
-        for (const [x, crew] of extra) await S.db.doc("shifts/" + x.id).update({ ...data, crew, updatedAt: at });
-        const s0 = g.items[0];
-        for (const crew of fill) await S.db.collection("shifts").add({ date: s0.date, start: s0.start, end: s0.end, breakMin: Number(s0.breakMin) || 0, site: s0.site, note: "",
-          status: "confirmed", source: "manual", calTitle: s0.calTitle || "", createdAt: at, ...data, crew });
-      }
-      for (const s of keep) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: at });
-      for (const s of drop) await S.db.doc("shifts/" + s.id).delete();
-      S.editing = null; document.activeElement?.blur(); render();
-    }
+  async function saveAll(g, data, msg) {
+    try { for (const s of g.items) await S.db.doc("shifts/" + s.id).update({ ...data, updatedAt: new Date().toISOString() }); S.editing = null; document.activeElement?.blur(); render(); }
     catch (e) { msg.className = "msg bad"; msg.textContent = errText(e); }
   }
   async function removeAll(g, btn, msg) {
@@ -487,7 +557,7 @@ tfoot td { font-weight: 600; border: 0 }
     const bad = L.filter((s) => problem(s)).length;
     $("payWarn").textContent = bad ? `${bad} shift${bad > 1 ? "s" : ""} this month still need a fix (red dots on the calendar). Fix them before paying.` : "";
     const by = new Map();
-    for (const s of L) { const o = by.get(s.site) || { v: new Set(), h: 0 }; o.v.add(`${s.date}|${s.start}`); o.h += hoursOf(s); by.set(s.site, o); }
+    for (const s of L) { const o = by.get(s.site) || { v: new Set(), h: 0 }; o.v.add(`${s.date}|${s.start}`); if (s.crew) o.h += hoursOf(s); by.set(s.site, o); }
     const rows = [...by].sort((a, b) => b[1].h - a[1].h);
     $("clientBody").replaceChildren(...(rows.length ? rows.map(([k, o]) => h("tr", {}, h("td", { text: k || "No client" }), h("td", { class: "n", text: o.v.size }), h("td", { class: "n", text: fmt(o.h) })))
       : [h("tr", {}, h("td", { colspan: 3, class: "empty", text: "No hours this month." }))]));
@@ -508,7 +578,9 @@ tfoot td { font-weight: 600; border: 0 }
         } catch (e) { note.textContent = errText(e); }
       };
       em.addEventListener("change", save); if (rate) rate.addEventListener("change", save);
-      return h("div", { class: "item" }, h("b", { text: c.name }), em, h("div", { class: "row" }, rate, note));
+      const hide = h("button", { type: "button", class: "link" + (c.active === false ? "" : " danger"), onclick: () => S.db.doc("crew/" + c.id).update({ active: c.active === false }).catch((e) => { note.textContent = errText(e); }) },
+        c.active === false ? "Bring back" : "Hide");
+      return h("div", { class: "item", style: c.active === false ? "opacity:.6" : null }, h("b", { text: c.name + (c.active === false ? " (hidden)" : "") }), em, h("div", { class: "row" }, rate, hide, note));
     }));
     const q = $("sSearch").value.trim().toLowerCase();
     const all = S.sites.filter((x) => x.active !== false);
